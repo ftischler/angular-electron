@@ -2,4 +2,7 @@
   <h1 class="title">
     {{ 'PAGES.HOME.TITLE' | translate }}
   </h1>
+  <video id="video" autoplay #webcam></video>
+  <canvas id="canvas" #canvas height="480" width="800"></canvas>
+  <button (click)="capture()">Capture!</button>
 </div>

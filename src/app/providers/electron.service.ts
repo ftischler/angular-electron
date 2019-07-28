@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 import { ipcRenderer, webFrame, remote } from 'electron';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
+import { join } from 'path';
 
 @Injectable()
 export class ElectronService {
@@ -31,4 +32,7 @@ export class ElectronService {
     return window && window.process && window.process.type;
   }
 
+  writeImage(image: string): void {
+    fs.writeFileSync(join('/Users/ftischler/Desktop', 'image.png'), image, 'base64');
+  }
 }
