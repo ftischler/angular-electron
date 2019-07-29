@@ -1,7 +1,15 @@
 /* You can add global styles to this file, and also import other style files */
+@font-face {
+  font-family: 'OpenSansRegular';
+  src: url('assets/OpenSans-Regular.ttf') format('truetype');
+  font-weight: normal;
+}
+
 html, body {
   margin: 0;
   padding: 0;
 
   height: 100%;
+
+  font-family: 'OpenSansRegular', Verdana, Arial, sans-serif;
 }

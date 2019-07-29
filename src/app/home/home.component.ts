@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { ElectronService } from '../../providers/electron.service';
+import { SaveImageService } from '../save-image/save-image.service';
 
 @Component({
   selector: 'app-home',
@@ -12,7 +12,7 @@ export class HomeComponent implements OnInit {
 
   private canvasCtx: CanvasRenderingContext2D;
 
-  constructor(private electronService: ElectronService) { }
+  constructor(private saveImageService: SaveImageService) { }
 
   ngOnInit() {
     const constraints = {
@@ -39,7 +39,7 @@ export class HomeComponent implements OnInit {
     this.canvasCtx.drawImage(this.webcamVideo.nativeElement, 0, 0, 640, 480);
     const url = this.canvas.nativeElement.toDataURL('image/jpg', 0.8);
     const base64Data = url.replace(/^data:image\/png;base64,/, '');
-    this.electronService.writeImage(base64Data);
+    this.saveImageService.writeImage(base64Data);
   }
 
 }
