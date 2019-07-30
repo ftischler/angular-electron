@@ -39,7 +39,7 @@ export class HomeComponent implements OnInit {
       error => console.error(error));
   }
 
-  get klassen(): string[] {
+  get klassen(): Set<string> {
     return this.readExcelService.getKlassen();
   }
 
