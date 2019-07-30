@@ -1,6 +1,6 @@
 <h1>Passbild App</h1>
 
-<img src="assets/BSS_Logo.png" alt="Berufliche Schulen Schramberg Logo">
+<img class="logo" src="assets/BSS_Logo.png" alt="Berufliche Schulen Schramberg Logo">
 
 <form>
   <mat-form-field class="klasse">
@@ -26,11 +26,14 @@
 </form>
 
 <figure>
-  <figcaption>Nehmen Sie ein Foto analog dem Musterfoto</figcaption>
-  <canvas #canvas></canvas>
+  <figcaption>Nehmen Sie ein Foto, bei dem Ihr Gesicht gut zu sehen ist.</figcaption>
+  <figure class="musterbild">
+    <img src="assets/persona.jpg" alt="Musterbild">
+    <figcaption>Kamera wird geladen...</figcaption>
+  </figure>
   <video autoplay #webcam></video>
+  <canvas width="500" height="500" #canvas></canvas>
   <button class="capture-btn" (click)="capture()">Aufnehmen</button>
   <button class="delete-btn" (click)="delete()">Löschen</button>
-  <button class="submit-btn" (click)="submit()">Foto abspeichern</button>
 </figure>
 

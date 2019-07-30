@@ -3,7 +3,7 @@
 :host {
   margin: 1em;
   display: grid;
-  grid-gap: 1em;
+  grid-gap: 1.5em 1em;
   grid: "title logo"
         "form  foto" /
         1fr    1fr;
@@ -11,7 +11,7 @@
   @media(max-width: $breakpoint__tablet) {
     grid: "title logo"
           "form  form"
-          "foto  foto" /
+          "foto  foto"/
           1fr    1fr;
   }
 
@@ -29,7 +29,7 @@ h1 {
   grid-area: title;
 }
 
-img {
+.logo {
   grid-area: logo;
  justify-self: center;
 }
@@ -72,24 +72,42 @@ form {
 
 figure {
   grid-area: foto;
+  place-self: center;
   margin: 0;
 
   display: grid;
   grid-gap: 1em;
   grid: "caption     caption"
-        "picture     picture"
-        "capture-btn delete-btn"
-        "submit-btn  submit-btn"/
+        "picture     picture" 500px
+        "capture-btn delete-btn" /
         1fr          1fr;
+
+  & > .musterbild {
+    grid-area: picture;
+    width: 100%;
+
+    display: grid;
+    grid: "area";
+    place-items: center;
+
+    & > figcaption {
+      grid-area: area;
+      align-self: flex-end;
+      padding-bottom: 2em;
+    }
+
+    & > img {
+      grid-area: area;
+      width: 100%;
+    }
+  }
 
   & > canvas {
     grid-area: picture;
-    z-index: 100;
   }
 
   & > video {
     grid-area: picture;
-    z-index: 5;
   }
 
   & > figcaption {
@@ -102,9 +120,5 @@ figure {
 
   & > .delete-btn {
     grid-area: delete-btn;
-  }
-
-  & > .submit-btn {
-    grid-area: submit-btn;
   }
 }
