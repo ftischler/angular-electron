@@ -1,19 +1,7 @@
 {
-  "name": "angular-electron",
-  "version": "6.0.1",
-  "description": "Angular 8 with Electron (Typescript + SASS + Hot Reload)",
-  "homepage": "https://github.com/maximegris/angular-electron",
-  "author": {
-    "name": "Maxime GRIS",
-    "email": "maxime.gris@gmail.com"
-  },
-  "keywords": [
-    "angular",
-    "angular 8",
-    "electron",
-    "typescript",
-    "sass"
-  ],
+  "name": "passbild",
+  "version": "1.0.0",
+  "description": "Passbild aufnehmen und in einem spezifizierten Ordner speichern",
   "main": "main.js",
   "private": true,
   "scripts": {
@@ -80,5 +68,11 @@
   },
   "engines": {
     "node": ">=10.9.0"
+  },
+  "dependencies": {
+    "@angular/animations": "^8.0.0 || ^9.0.0-0",
+    "@angular/cdk": "~8.1.1",
+    "@angular/forms": "^8.0.0 || ^9.0.0-0",
+    "@angular/material": "~8.1.1"
   }
 }

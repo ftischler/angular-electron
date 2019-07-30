@@ -1,4 +1,110 @@
+@import '../../variables.scss';
+
 :host {
-  height: 100%;
+  margin: 1em;
   display: grid;
+  grid-gap: 1em;
+  grid: "title logo"
+        "form  foto" /
+        1fr    1fr;
+
+  @media(max-width: $breakpoint__tablet) {
+    grid: "title logo"
+          "form  form"
+          "foto  foto" /
+          1fr    1fr;
+  }
+
+  @media(max-width: $breakpoint__mobile) {
+    grid: "title"
+          "logo"
+          "form"
+          "foto" /
+          1fr;
+    text-align: center;
+  }
+}
+
+h1 {
+  grid-area: title;
+}
+
+img {
+  grid-area: logo;
+ justify-self: center;
+}
+
+form {
+  grid-area: form;
+  align-self: flex-start;
+
+  display: grid;
+  grid: "klasse   ."
+        "vorname  nachname"
+        "gebdatum ." /
+        1fr       1fr;
+  grid-gap: 1em;
+
+  & > .klasse {
+    grid-area: klasse;
+  }
+
+  & > .vorname {
+    grid-area: vorname;
+  }
+
+  & > .nachname {
+    grid-area: nachname;
+  }
+
+  & > .gebdatum {
+    grid-area: gebdatum;
+  }
+
+  @media(max-width: $breakpoint__mobile) {
+    grid: "klasse"
+          "vorname"
+          "nachname"
+          "gebdatum" /
+          1fr;
+  }
+}
+
+figure {
+  grid-area: foto;
+  margin: 0;
+
+  display: grid;
+  grid-gap: 1em;
+  grid: "caption     caption"
+        "picture     picture"
+        "capture-btn delete-btn"
+        "submit-btn  submit-btn"/
+        1fr          1fr;
+
+  & > canvas {
+    grid-area: picture;
+    z-index: 100;
+  }
+
+  & > video {
+    grid-area: picture;
+    z-index: 5;
+  }
+
+  & > figcaption {
+    grid-area: caption;
+  }
+
+  & > .capture-btn {
+    grid-area: capture-btn;
+  }
+
+  & > .delete-btn {
+    grid-area: delete-btn;
+  }
+
+  & > .submit-btn {
+    grid-area: submit-btn;
+  }
 }

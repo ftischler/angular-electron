@@ -1,5 +1,36 @@
 <h1>Passbild App</h1>
+
 <img src="assets/BSS_Logo.png" alt="Berufliche Schulen Schramberg Logo">
-<video autoplay #webcam></video>
-<canvas #canvas height="480" width="800"></canvas>
-<button (click)="capture()">Capture!</button>
+
+<form>
+  <mat-form-field class="klasse">
+    <mat-label>Klasse</mat-label>
+    <mat-select>
+      <mat-option *ngFor="let klasse of klassen" [value]="klasse">
+        {{klasse}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field class="vorname">
+    <input matInput disabled placeholder="Vorname" value="Max">
+  </mat-form-field>
+
+  <mat-form-field class="nachname">
+    <input matInput disabled placeholder="Nachname" value="Mustermann">
+  </mat-form-field>
+
+  <mat-form-field class="gebdatum">
+    <input matInput disabled placeholder="Geburtsdatum" value="01.01.1990">
+  </mat-form-field>
+</form>
+
+<figure>
+  <figcaption>Nehmen Sie ein Foto analog dem Musterfoto</figcaption>
+  <canvas #canvas></canvas>
+  <video autoplay #webcam></video>
+  <button class="capture-btn" (click)="capture()">Aufnehmen</button>
+  <button class="delete-btn" (click)="delete()">Löschen</button>
+  <button class="submit-btn" (click)="submit()">Foto abspeichern</button>
+</figure>
+

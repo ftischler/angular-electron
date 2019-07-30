@@ -1,4 +1,4 @@
-import { app, BrowserWindow, screen } from 'electron';
+import { app, BrowserWindow, screen, Menu } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 
@@ -20,7 +20,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
     },
-    autoHideMenuBar: true,
+    autoHideMenuBar: false,
   });
 
   if (serve) {
@@ -56,6 +56,17 @@ try {
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
   app.on('ready', createWindow);
+
+  app.on('ready', () => {
+    const menu = Menu.buildFromTemplate([
+      {
+        label: 'Einstellungen',
+          submenu:[
+            {label: 'Pfade'}
+          ]
+      }
+    ])
+  });
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {

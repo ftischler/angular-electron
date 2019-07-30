@@ -5,11 +5,41 @@
   font-weight: normal;
 }
 
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
 html, body {
-  margin: 0;
-  padding: 0;
-
   height: 100%;
+}
 
+body {
+  margin: 0;
   font-family: 'OpenSansRegular', Verdana, Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+
+  --color__action: #E06D06;
+  --color__main: #3e4244;
+}
+
+button {
+  padding: .687em .5em;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 1rem;
+
+  background-color: var(--color__action);
+  color: white;
+  border: .063em solid var(--color__action);
+
+  &:hover, &:focus {
+    background-color: white;
+    color: var(--color__main);
+    border-color: var(--color__main);
+  }
+
+  &:active {
+    outline: 0;
+  }
 }
