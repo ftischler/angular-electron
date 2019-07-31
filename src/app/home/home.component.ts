@@ -7,6 +7,8 @@ import { ReadExcelService } from '../read-excel/read-excel.service';
 // TODO mit Maustasten oben/unten durch Klassen/Namen switchen
 // TODO einstellungs menü für laufwerk erstellen
 
+// TODO überlegen: bei klick auf 'Aufnehmen' statt sofort foto -> von 5 auf 0 runterzählen um Schüler Zeit zu geben in die Kamera zu schauen.
+
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -17,6 +19,7 @@ export class HomeComponent implements OnInit {
   @ViewChild('canvas', {static: true}) canvas: ElementRef<HTMLCanvasElement>;
 
   private readonly SQUARESIZE = 500;
+  private canvasCtx: CanvasRenderingContext2D;
 
   constructor(private saveImageService: SaveImageService, private readExcelService: ReadExcelService) { }
 
@@ -46,19 +49,17 @@ export class HomeComponent implements OnInit {
   capture(): void {
     this.drawImage();
     this.saveImage();
-
-    console.log('diana stinkt');
   }
 
   delete(): void {
-    console.log('diana lümmelt rum');
+    this.canvasCtx.clearRect(0, 0, this.SQUARESIZE, this.SQUARESIZE);
 
     // TODO löscht nicht das gespeicherte Bild auf dem Laufwerk, so ok?
   }
 
   drawImage(): void {
-    const canvasCtx = this.canvas.nativeElement.getContext('2d');
-    canvasCtx.drawImage(this.webcamVideo.nativeElement, 0, 0, this.SQUARESIZE, this.SQUARESIZE);
+    this.canvasCtx = this.canvas.nativeElement.getContext('2d');
+    this.canvasCtx.drawImage(this.webcamVideo.nativeElement, 0, 0, this.SQUARESIZE, this.SQUARESIZE);
   }
 
   saveImage(): void {
