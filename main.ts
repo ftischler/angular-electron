@@ -55,17 +55,46 @@ try {
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
-  app.on('ready', createWindow);
-
   app.on('ready', () => {
+    createWindow();
+
     const menu = Menu.buildFromTemplate([
       {
+        label: 'Electron',
+        submenu:[
+          {role: 'close'},
+          {type: 'separator'},
+          {role: 'quit'}
+        ]
+      },
+      {
+        label: 'Ansicht',
+        submenu:[
+          {role: 'reload'},
+          {role: 'forcereload'},
+          {role: 'toggledevtools'},
+          {type: 'separator'},
+          {role: 'zoomin'},
+          {role: 'zoomout'},
+          {role: 'resetzoom'},
+          {type: 'separator'},
+          {role: 'togglefullscreen'}
+        ]
+      },
+      {
+        label: 'Fenster',
+        submenu:[
+          {role: 'minimize'}
+        ]
+      },
+      {
         label: 'Einstellungen',
-          submenu:[
-            {label: 'Pfade'}
-          ]
-      }
-    ])
+        submenu:[
+          {label: 'Pfade', click() {console.log('haemmler hat nen kleinen penis.')}}
+        ]
+      },
+    ]);
+    Menu.setApplicationMenu(menu);
   });
 
   // Quit when all windows are closed.

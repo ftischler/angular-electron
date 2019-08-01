@@ -9,7 +9,7 @@
         1fr    1fr;
 
   @media(max-width: $breakpoint__tablet) {
-    grid: "logo"
+    grid-template: "logo"
           "form"
           "foto" /
           1fr;
@@ -50,7 +50,7 @@ form {
   }
 
   @media(max-width: $breakpoint__mobile) {
-    grid: "klasse"
+    grid-template: "klasse"
           "vorname"
           "nachname"
           "gebdatum" /
@@ -58,7 +58,7 @@ form {
   }
 }
 
-figure {
+.foto {
   grid-area: foto;
   place-self: center;
   margin: 0;
@@ -73,9 +73,12 @@ figure {
   & > .musterbild {
     grid-area: picture;
     width: 100%;
+    place-self: center;
+    margin: 0;
 
     display: grid;
-    grid: "area";
+    grid-template: "area" /
+          1fr;
     place-items: center;
 
     & > figcaption {

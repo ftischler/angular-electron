@@ -1,18 +1,20 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { SaveImageService } from '../save-image/save-image.service';
 import { ReadExcelService } from '../read-excel/read-excel.service';
 
-// TODO ausgewählten dateiname speichern statt image.png
 // TODO .exe icon aktuell angular logo -> evtl bss logo nehmen?
 // TODO mit Maustasten oben/unten durch Klassen/Namen switchen
 // TODO einstellungs menü für laufwerk erstellen
 
 // TODO überlegen: bei klick auf 'Aufnehmen' statt sofort foto -> von 5 auf 0 runterzählen um Schüler Zeit zu geben in die Kamera zu schauen.
 
+// TODO evtl eine Suche nach Name
+
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HomeComponent implements OnInit {
   @ViewChild('webcam', {static: true}) webcamVideo: ElementRef<HTMLVideoElement>;
@@ -67,6 +69,6 @@ export class HomeComponent implements OnInit {
     //  Die Idee wäre hierbei erst ein paar Schnappschüsse auszuprobieren und sich dann explizit auf siene Auswahl festlegen kann.
     const url = this.canvas.nativeElement.toDataURL('image/jpg', 0.8);
     const base64Data = url.replace(/^data:image\/png;base64,/, '');
-    this.saveImageService.writeImage(base64Data);
+    this.saveImageService.writeImage(base64Data, 'my_name');
   }
 }
