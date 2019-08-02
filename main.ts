@@ -82,6 +82,18 @@ try {
         ]
       },
       {
+        label: 'Edit',
+        submenu:[
+          {role: 'undo'},
+          {role: 'redo'},
+          {type: 'separator'},
+          {role: 'cut'},
+          {role: 'copy'},
+          {role: 'paste'},
+          {role: 'delete'},
+        ]
+      },
+      {
         label: 'Fenster',
         submenu:[
           {role: 'minimize'}
@@ -90,7 +102,11 @@ try {
       {
         label: 'Einstellungen',
         submenu:[
-          {label: 'Pfade', click() {console.log('haemmler hat nen kleinen penis.')}}
+          {label: 'Laufwerkpfad einstellen',
+            click() {
+              win.webContents.send('change-path');
+            }
+          }
         ]
       },
     ]);

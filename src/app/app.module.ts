@@ -11,6 +11,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material';
+import { RxNgZoneSchedulerModule } from 'ngx-rxjs-zone-scheduler';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { MatButtonModule } from '@angular/material';
     BrowserAnimationsModule,
     MatSelectModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
+    RxNgZoneSchedulerModule
   ],
   bootstrap: [AppComponent]
 })

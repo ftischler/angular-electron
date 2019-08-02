@@ -4,8 +4,12 @@ import { Routes, RouterModule } from '@angular/router';
 
 const routes: Routes = [
     {
-        path: '',
-        component: HomeComponent
+      path: '',
+      component: HomeComponent
+    },
+    {
+      path: 'changepath',
+      loadChildren: () => import('./change-path/change-path.module').then(mod => mod.ChangePathModule)
     }
 ];
 

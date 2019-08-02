@@ -105,11 +105,24 @@ form {
     grid-area: caption;
   }
 
-  & > .capture-btn {
+  & > .capture-grp {
     grid-area: capture-btn;
   }
 
   & > .delete-btn {
     grid-area: delete-btn;
   }
+}
+
+.capture-grp {
+  display: flex;
+  align-items: center;
+
+  & > .capture-btn {
+    flex-grow: 1;
+  }
+}
+
+.timer-btn {
+  font-size: 1.2rem;
 }

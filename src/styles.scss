@@ -32,9 +32,24 @@ button {
     background-color: white;
     color: var(--color__main);
     border-color: var(--color__main);
+
+    &.icon > svg {
+      fill: var(--color__main);
+    }
   }
 
   &:active {
     outline: 0;
+  }
+
+  &.icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    & > svg {
+      fill: white;
+      margin-right: .1em;
+    }
   }
 }

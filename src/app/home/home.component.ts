@@ -1,12 +1,11 @@
 import { ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { SaveImageService } from '../save-image/save-image.service';
 import { ReadExcelService } from '../read-excel/read-excel.service';
+import { Observable, timer } from 'rxjs';
+import { finalize, map, take } from 'rxjs/operators';
 
 // TODO .exe icon aktuell angular logo -> evtl bss logo nehmen?
 // TODO mit Maustasten oben/unten durch Klassen/Namen switchen
-// TODO einstellungs menü für laufwerk erstellen
-
-// TODO überlegen: bei klick auf 'Aufnehmen' statt sofort foto -> von 5 auf 0 runterzählen um Schüler Zeit zu geben in die Kamera zu schauen.
 
 // TODO evtl eine Suche nach Name
 
@@ -20,10 +19,12 @@ export class HomeComponent implements OnInit {
   @ViewChild('webcam', {static: true}) webcamVideo: ElementRef<HTMLVideoElement>;
   @ViewChild('canvas', {static: true}) canvas: ElementRef<HTMLCanvasElement>;
 
+  countdown$: Observable<number>;
   private readonly SQUARESIZE = 500;
   private canvasCtx: CanvasRenderingContext2D;
 
-  constructor(private saveImageService: SaveImageService, private readExcelService: ReadExcelService) { }
+  constructor(private saveImageService: SaveImageService, private readExcelService: ReadExcelService) {
+  }
 
   ngOnInit() {
     const webcamConfig = {
@@ -53,10 +54,19 @@ export class HomeComponent implements OnInit {
     this.saveImage();
   }
 
-  delete(): void {
-    this.canvasCtx.clearRect(0, 0, this.SQUARESIZE, this.SQUARESIZE);
+  timedCapture(): void {
+    const CNTDWNFRM = 3;
+    this.countdown$ = timer(0, 1000).pipe(
+      take(CNTDWNFRM + 1),
+      map(i => CNTDWNFRM - i),
+      finalize(() => this.capture())
+    );
+  }
 
-    // TODO löscht nicht das gespeicherte Bild auf dem Laufwerk, so ok?
+  delete(): void {
+    if (this.canvasCtx) {
+      this.canvasCtx.clearRect(0, 0, this.SQUARESIZE, this.SQUARESIZE);
+    }
   }
 
   drawImage(): void {
@@ -65,8 +75,6 @@ export class HomeComponent implements OnInit {
   }
 
   saveImage(): void {
-    // TODO speichert das aufgenommene automatisch, denkbar auch ein weiterer 'Foto abspeichern'.
-    //  Die Idee wäre hierbei erst ein paar Schnappschüsse auszuprobieren und sich dann explizit auf siene Auswahl festlegen kann.
     const url = this.canvas.nativeElement.toDataURL('image/jpg', 0.8);
     const base64Data = url.replace(/^data:image\/png;base64,/, '');
     this.saveImageService.writeImage(base64Data, 'my_name');

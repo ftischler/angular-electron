@@ -1,19 +1,28 @@
-import { Component } from '@angular/core';
-import { ElectronService } from './electron/electron.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ElectronEventService } from './change-path/electron-event.service';
+import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html'
 })
-export class AppComponent {
-  constructor(public electronService: ElectronService) {
+export class AppComponent implements OnInit, OnDestroy {
+  private destroy$$ = new Subject();
 
-    if (electronService.isElectron()) {
-      console.log('Mode electron');
-      console.log('Electron ipcRenderer', electronService.ipcRenderer);
-      console.log('NodeJS childProcess', electronService.childProcess);
-    } else {
-      console.log('Mode web');
-    }
+  constructor(public electronEventService: ElectronEventService, private router: Router) {
+  }
+
+  ngOnInit(): void {
+    this.electronEventService.pathChange$.pipe(
+      takeUntil(this.destroy$$)
+    ).subscribe(async () => {
+      await this.router.navigate(['changepath']);
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$$.next();
   }
 }

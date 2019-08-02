@@ -8,6 +8,6 @@ import * as fs from 'fs';
 export class SaveImageService {
 
   writeImage(image: string, name: string): void {
-    fs.writeFileSync(join('/Users/alexanderschuster/Desktop', name + '.png'), image, 'base64');
+    fs.writeFileSync(join(JSON.parse(window.localStorage.getItem('path')), name + '.png'), image, 'base64');
   }
 }

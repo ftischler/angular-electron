@@ -1,0 +1,15 @@
+form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 1em;
+  margin: 2em;
+  max-width: 500px;
+}
+
+mat-form-field {
+  grid-column: span 2;
+}
+
+button {
+  grid-row: 2;
+}
