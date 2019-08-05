@@ -16,6 +16,15 @@ export class ReadExcelService {
     this.parseExcel();
   }
 
+  colNumber(key: string) {
+    return JSON.parse(window.localStorage.getItem(key));
+  }
+
+  minmaxCols(): {min: string, max: string} {
+    const sortedCols = ['vornameSpalte', 'nachnameSpalte', 'gebdatumSpalte', 'klasseSpalte'].map(key => JSON.parse(window.localStorage.getItem(key))).sort();
+    return {min: sortedCols[0], max: sortedCols[sortedCols.length - 1]};
+  }
+
   getKlassen(): Set<string> { // TODO return undef if no data and handle in home cmp, also for other getter
     return new Set(this.data.map(x => x.klasse));
   }
@@ -37,8 +46,13 @@ export class ReadExcelService {
       const wb: WorkBook = readFile(join(JSON.parse(window.localStorage.getItem('excelPath'))), {type: 'string', dateNF: this.DATEFORMAT});
       const ws: WorkSheet = wb.Sheets[ wb.SheetNames[ 0 ] ];
 
+      // limit range to the needed columns
+      let range = utils.decode_range(ws['!ref']);
+      range.s.c = utils.decode_col(this.minmaxCols().min);
+      range.e.c = utils.decode_col(this.minmaxCols().max);
+      const new_range = utils.encode_range(range);
       // use default header still, then map as wanted (or consider "A", then loop over first row to get relevant cols, then filter out everything not needed)
-      this.data = utils.sheet_to_json(ws, {header: ['vorname', 'nachname', 'gebdatum', 'klasse'],raw: false}).filter((_, index) => index !== 0) as SchuelerMitKlasse[];
+      this.data = utils.sheet_to_json(ws, {header: ['vorname', 'nachname', 'gebdatum', 'klasse'], raw: false, range: new_range}).filter((_, index) => index !== 0) as SchuelerMitKlasse[];
     } else {
       console.log('wurstfinger');
     }
