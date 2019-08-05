@@ -1,10 +1,12 @@
-import { app, BrowserWindow, screen } from 'electron';
+import { app, BrowserWindow, screen, Menu } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 
 let win, serve;
 const args = process.argv.slice(1);
 serve = args.some(val => val === '--serve');
+
+// TODO check initial size of final app window
 
 function createWindow() {
 
@@ -20,6 +22,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
     },
+    autoHideMenuBar: false,
   });
 
   if (serve) {
@@ -50,11 +53,66 @@ function createWindow() {
 }
 
 try {
-
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
-  app.on('ready', createWindow);
+  app.on('ready', () => {
+    createWindow();
+
+    const menu = Menu.buildFromTemplate([
+      {
+        label: 'Electron',
+        submenu:[
+          {role: 'close'},
+          {type: 'separator'},
+          {role: 'quit'}
+        ]
+      },
+      {
+        label: 'Ansicht',
+        submenu:[
+          {role: 'reload'},
+          {role: 'forcereload'},
+          {role: 'toggledevtools'},
+          {type: 'separator'},
+          {role: 'zoomin'},
+          {role: 'zoomout'},
+          {role: 'resetzoom'},
+          {type: 'separator'},
+          {role: 'togglefullscreen'}
+        ]
+      },
+      {
+        label: 'Edit',
+        submenu:[
+          {role: 'undo'},
+          {role: 'redo'},
+          {type: 'separator'},
+          {role: 'cut'},
+          {role: 'copy'},
+          {role: 'paste'},
+          {role: 'delete'},
+        ]
+      },
+      {
+        label: 'Fenster',
+        submenu:[
+          {role: 'minimize'}
+        ]
+      },
+      {
+        label: 'Einstellungen',
+        submenu:[
+          {label: 'Laufwerkpfade einstellen',
+            click() {
+              win.webContents.send('change-paths');
+            }
+          }
+        ]
+      },
+    ]);
+    Menu.setApplicationMenu(menu);
+  });
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {

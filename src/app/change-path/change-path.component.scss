@@ -1,0 +1,72 @@
+form {
+  display: grid;
+  grid-template:
+    'title          title'
+    'picturePath    picturePath'
+    'excelPath      excelPath'
+    'subtitle       subtitle'
+    'vornameSpalte  nachnameSpalte'
+    'gebdatumSpalte klasseSpalte'
+    'backButton     saveButton' /
+    1fr             1fr;
+  grid-gap: 1em;
+  margin: 2em;
+  max-width: 600px;
+
+  @media(max-width: 500px) {
+    grid-template:
+      'title'
+      'picturePath'
+      'excelPath'
+      'subtitle'
+      'vornameSpalte'
+      'nachnameSpalte'
+      'gebdatumSpalte'
+      'klasseSpalte'
+      'backButton'
+      'saveButton' /
+      1fr;
+  }
+}
+
+h1 {
+  grid-area: title;
+  margin: 0;
+}
+
+.picturePath {
+  grid-area: picturePath;
+}
+
+.excelPath {
+  grid-area: excelPath;
+}
+
+h2 {
+  grid-area: subtitle;
+  margin-bottom: 0;
+}
+
+.vornameSpalte {
+  grid-area: vornameSpalte;
+}
+
+.nachnameSpalte {
+  grid-area: nachnameSpalte;
+}
+
+.gebdatumSpalte {
+  grid-area: gebdatumSpalte;
+}
+
+.klasseSpalte {
+  grid-area: klasseSpalte;
+}
+
+.back {
+  grid-area: backButton;
+}
+
+.save {
+  grid-area: saveButton;
+}

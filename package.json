@@ -1,19 +1,7 @@
 {
-  "name": "angular-electron",
-  "version": "6.0.1",
-  "description": "Angular 8 with Electron (Typescript + SASS + Hot Reload)",
-  "homepage": "https://github.com/maximegris/angular-electron",
-  "author": {
-    "name": "Maxime GRIS",
-    "email": "maxime.gris@gmail.com"
-  },
-  "keywords": [
-    "angular",
-    "angular 8",
-    "electron",
-    "typescript",
-    "sass"
-  ],
+  "name": "passbild",
+  "version": "1.0.0",
+  "description": "Passbild aufnehmen und in einem spezifizierten Ordner speichern",
   "main": "main.js",
   "private": true,
   "scripts": {
@@ -39,6 +27,8 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "0.800.0",
+    "@angular/animations": "8.1.3",
+    "@angular/cdk": "8.1.1",
     "@angular/cli": "8.0.1",
     "@angular/common": "8.0.0",
     "@angular/compiler": "8.0.0",
@@ -46,15 +36,15 @@
     "@angular/core": "8.0.0",
     "@angular/forms": "8.0.0",
     "@angular/language-service": "8.0.0",
+    "@angular/material": "8.1.1",
     "@angular/platform-browser": "8.0.0",
     "@angular/platform-browser-dynamic": "8.0.0",
     "@angular/router": "8.0.0",
-    "@ngx-translate/core": "11.0.1",
-    "@ngx-translate/http-loader": "4.0.0",
     "@types/jasmine": "2.8.7",
     "@types/jasminewd2": "2.0.3",
     "@types/mocha": "5.2.6",
     "@types/node": "8.9.4",
+    "@types/xlsx": "0.0.36",
     "chai": "4.2.0",
     "codelyzer": "5.0.1",
     "conventional-changelog-cli": "2.0.11",
@@ -69,7 +59,9 @@
     "karma-coverage-istanbul-reporter": "2.0.4",
     "karma-jasmine": "2.0.1",
     "karma-jasmine-html-reporter": "1.4.0",
+    "lodash": "4.17.15",
     "mocha": "6.1.2",
+    "ngx-rxjs-zone-scheduler": "0.2.1",
     "npm-run-all": "4.1.5",
     "rxjs": "6.5.2",
     "spectron": "5.0.0",
@@ -78,6 +70,7 @@
     "typescript": "3.4.5",
     "wait-on": "3.2.0",
     "webdriver-manager": "12.1.0",
+    "xlsx": "0.14.4",
     "zone.js": "0.9.1"
   },
   "engines": {

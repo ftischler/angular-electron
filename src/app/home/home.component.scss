@@ -1,0 +1,129 @@
+@import '../../variables.scss';
+
+:host {
+  margin: 1em;
+  display: grid;
+  grid-gap: 1.5em 1em;
+  grid: "logo  foto"
+        "form  foto" /
+        1fr    1fr;
+
+  @media(max-width: $breakpoint__tablet) {
+    grid-template: "logo"
+          "form"
+          "foto" /
+          1fr;
+    text-align: center;
+  }
+}
+
+.logo {
+  grid-area: logo;
+ justify-self: center;
+}
+
+form {
+  grid-area: form;
+  align-self: flex-start;
+
+  display: grid;
+  grid: "klasse   ."
+        "vorname  nachname"
+        "gebdatum ." /
+        1fr       1fr;
+  grid-gap: 1em;
+
+  & > .klasse {
+    grid-area: klasse;
+    margin-bottom: 1em;
+  }
+
+  & > .vorname {
+    grid-area: vorname;
+  }
+
+  & > .nachname {
+    grid-area: nachname;
+  }
+
+  & > .gebdatum {
+    grid-area: gebdatum;
+  }
+
+  @media(max-width: $breakpoint__mobile) {
+    grid-template: "klasse"
+          "vorname"
+          "nachname"
+          "gebdatum" /
+          1fr;
+  }
+}
+
+.foto {
+  grid-area: foto;
+  place-self: center;
+  margin: 0;
+
+  display: grid;
+  grid-gap: 1em;
+  grid: "caption     caption"
+        "picture     picture" 500px
+        "capture-btn delete-btn" /
+        1fr          1fr;
+
+  & > .musterbild {
+    grid-area: picture;
+    width: 100%;
+    place-self: center;
+    margin: 0;
+
+    display: grid;
+    grid-template: "area" /
+          1fr;
+    place-items: center;
+
+    & > figcaption {
+      grid-area: area;
+      align-self: flex-end;
+      padding-bottom: 2em;
+    }
+
+    & > img {
+      grid-area: area;
+      width: 100%;
+    }
+  }
+
+  & > canvas {
+    grid-area: picture;
+  }
+
+  & > video {
+    grid-area: picture;
+  }
+
+  & > figcaption {
+    grid-area: caption;
+  }
+
+  & > .capture-grp {
+    grid-area: capture-btn;
+  }
+
+  & > .delete-btn {
+    grid-area: delete-btn;
+  }
+}
+
+.capture-grp {
+  display: flex;
+  align-items: center;
+
+  & > .capture-btn {
+    flex-grow: 1;
+  }
+}
+
+.timer-btn {
+  font-size: 1.2rem;
+}

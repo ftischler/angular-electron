@@ -1,26 +1,28 @@
-import { Component } from '@angular/core';
-import { ElectronService } from './providers/electron.service';
-import { TranslateService } from '@ngx-translate/core';
-import { AppConfig } from '../environments/environment';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ElectronEventService } from './change-path/electron-event.service';
+import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  templateUrl: './app.component.html'
 })
-export class AppComponent {
-  constructor(public electronService: ElectronService,
-    private translate: TranslateService) {
+export class AppComponent implements OnInit, OnDestroy {
+  private destroy$$ = new Subject();
 
-    translate.setDefaultLang('en');
-    console.log('AppConfig', AppConfig);
+  constructor(public electronEventService: ElectronEventService, private router: Router) {
+  }
 
-    if (electronService.isElectron()) {
-      console.log('Mode electron');
-      console.log('Electron ipcRenderer', electronService.ipcRenderer);
-      console.log('NodeJS childProcess', electronService.childProcess);
-    } else {
-      console.log('Mode web');
-    }
+  ngOnInit(): void {
+    this.electronEventService.pathChange$.pipe(
+      takeUntil(this.destroy$$)
+    ).subscribe(async () => {
+      await this.router.navigate(['changepath']);
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$$.next();
   }
 }
