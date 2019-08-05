@@ -7,11 +7,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Schueler } from '../schueler.model';
 import _ from "lodash";
 
-// TODO .exe icon aktuell angular logo -> evtl bss logo nehmen?
-
-// TODO check if paths are present --> if not show a info message
-
-// TODO zusätzliches feature: evtl ein Suchfeld nach Name
+// TODO check if paths in config are set --> if not show a info message
 
 @Component({
   selector: 'app-home',
@@ -62,6 +58,7 @@ export class HomeComponent implements OnInit {
   schuelerPool: Schueler[];
 
   private readonly SQUARESIZE = 500;
+  private readonly COUNTDOWN_FROM = 3;
   private canvasCtx: CanvasRenderingContext2D;
 
   constructor(private saveImageService: SaveImageService, private readExcelService: ReadExcelService) {
@@ -76,7 +73,7 @@ export class HomeComponent implements OnInit {
     });
 
     this.selectedKlasseForm.valueChanges.subscribe(selectedKlasse => {
-      this.schuelerPool = this.klasseAndSchueler.get(selectedKlasse);
+      this.schuelerPool = this.klasseWithSchueler.get(selectedKlasse);
       this.schuelerForm.setValue(this.schuelerPool[ 0 ]);
     });
 
@@ -102,8 +99,8 @@ export class HomeComponent implements OnInit {
     return this.readExcelService.getKlassen();
   }
 
-  get klasseAndSchueler(): Map<string, Schueler[]> {
-    return this.readExcelService.getKlasseAndSchueler();
+  get klasseWithSchueler(): Map<string, Schueler[]> {
+    return this.readExcelService.getKlasseWithSchueler();
   }
 
   capture(): void {
@@ -112,10 +109,9 @@ export class HomeComponent implements OnInit {
   }
 
   timedCapture(): void {
-    const CNTDWNFRM = 3;
     this.countdown$ = timer(0, 1000).pipe(
-      take(CNTDWNFRM + 1),
-      map(i => CNTDWNFRM - i),
+      take(this.COUNTDOWN_FROM + 1),
+      map(i => this.COUNTDOWN_FROM - i),
       finalize(() => this.capture())
     );
   }
