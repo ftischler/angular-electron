@@ -2,10 +2,10 @@ import { ChangeDetectionStrategy, Component, ElementRef, HostListener, OnInit, V
 import { SaveImageService } from '../save-image/save-image.service';
 import { ReadExcelService } from '../read-excel/read-excel.service';
 import { Observable, timer } from 'rxjs';
-import { finalize, map, take } from 'rxjs/operators';
+import { finalize, map, take, withLatestFrom } from 'rxjs/operators';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Schueler } from '../schueler.model';
-import _ from "lodash";
+import _ from 'lodash';
 
 // TODO check if paths in config are set --> if not show a info message
 
@@ -21,20 +21,20 @@ export class HomeComponent implements OnInit {
 
   @HostListener('document:keydown.arrowdown') onArrowDown() {
     const selectedKlasseIndex = this.klassenPool.findIndex(klasse => klasse === this.selectedKlasseForm.value);
-    const nextKlasse = this.klassenPool[(selectedKlasseIndex + 1) % this.klassenPool.length];
+    const nextKlasse = this.klassenPool[ (selectedKlasseIndex + 1) % this.klassenPool.length ];
     this.selectedKlasseForm.setValue(nextKlasse);
   }
 
   @HostListener('document:keydown.arrowup') onArrowUp() {
     const selectedKlasseIndex = this.klassenPool.findIndex(klasse => klasse === this.selectedKlasseForm.value);
-    const nextKlasse = this.klassenPool[(selectedKlasseIndex - 1) === -1 || (selectedKlasseIndex === -1) ? this.klassenPool.length - 1 : selectedKlasseIndex - 1 ];
+    const nextKlasse = this.klassenPool[ (selectedKlasseIndex - 1) === -1 || (selectedKlasseIndex === -1) ? this.klassenPool.length - 1 : selectedKlasseIndex - 1 ];
     this.selectedKlasseForm.setValue(nextKlasse);
   }
 
   @HostListener('document:keydown.arrowright') onArrowRight() {
     if (this.selectedKlasseForm.value) {
       const selectedSchuelerIndex = this.schuelerPool.findIndex(schueler => _.isEqual(schueler, this.schuelerForm.value));
-      const nextSchueler = this.schuelerPool[(selectedSchuelerIndex + 1) % this.schuelerPool.length];
+      const nextSchueler = this.schuelerPool[ (selectedSchuelerIndex + 1) % this.schuelerPool.length ];
       this.schuelerForm.setValue(nextSchueler);
     } else {
       this.selectedKlasseForm.markAsTouched();
@@ -44,7 +44,7 @@ export class HomeComponent implements OnInit {
   @HostListener('document:keydown.arrowleft') onArrowLeft() {
     if (this.selectedKlasseForm.value) {
       const selectedSchuelerIndex = this.schuelerPool.findIndex(schueler => _.isEqual(schueler, this.schuelerForm.value));
-      const nextSchueler = this.schuelerPool[(selectedSchuelerIndex - 1) === -1 || (selectedSchuelerIndex === -1) ? this.schuelerPool.length - 1 : selectedSchuelerIndex - 1 ];
+      const nextSchueler = this.schuelerPool[ (selectedSchuelerIndex - 1) === -1 || (selectedSchuelerIndex === -1) ? this.schuelerPool.length - 1 : selectedSchuelerIndex - 1 ];
       this.schuelerForm.setValue(nextSchueler);
     } else {
       this.selectedKlasseForm.markAsTouched();
@@ -54,7 +54,7 @@ export class HomeComponent implements OnInit {
   countdown$: Observable<number>;
   selectedKlasseForm: FormControl;
   schuelerForm: FormGroup;
-  klassenPool = Array.from(this.klassen);
+  klassenPool: string[];
   schuelerPool: Schueler[];
 
   private readonly SQUARESIZE = 500;
@@ -65,17 +65,19 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.selectedKlasseForm =  new FormControl('', [Validators.required]);
+    this.selectedKlasseForm = new FormControl('', [Validators.required]);
     this.schuelerForm = new FormGroup({
       vorname: new FormControl({value: '', disabled: true}),
       nachname: new FormControl({value: '', disabled: true}),
       gebdatum: new FormControl({value: '', disabled: true})
     });
 
-    this.selectedKlasseForm.valueChanges.subscribe(selectedKlasse => {
-      this.schuelerPool = this.klasseWithSchueler.get(selectedKlasse);
+    this.selectedKlasseForm.valueChanges.pipe(withLatestFrom(this.readExcelService.klassenWithSchueler$)).subscribe(([selectedKlasse, data]) => {
+      this.schuelerPool = data.get(selectedKlasse);
       this.schuelerForm.setValue(this.schuelerPool[ 0 ]);
     });
+
+    this.readExcelService.klassen$.subscribe(klassen => this.klassenPool = klassen);
 
     const webcamConfig = {
       audio: false,
@@ -93,14 +95,6 @@ export class HomeComponent implements OnInit {
       webcamConfig as any,
       stream => this.webcamVideo.nativeElement.srcObject = stream,
       error => console.error(error));
-  }
-
-  get klassen(): Set<string> {
-    return this.readExcelService.getKlassen();
-  }
-
-  get klasseWithSchueler(): Map<string, Schueler[]> {
-    return this.readExcelService.getKlasseWithSchueler();
   }
 
   capture(): void {

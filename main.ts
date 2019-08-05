@@ -6,7 +6,7 @@ let win, serve;
 const args = process.argv.slice(1);
 serve = args.some(val => val === '--serve');
 
-// TODO check initial size of final app
+// TODO check initial size of final app window
 
 function createWindow() {
 

@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { readFile, utils, WorkBook, WorkSheet } from 'xlsx';
 import { join } from 'path';
 import { Schueler } from '../schueler.model';
+import { Observable, ReplaySubject } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -10,9 +12,7 @@ export class ReadExcelService {
 
   private readonly DATEFORMAT = 'dd"."mm"."yyyy';
 
-  // TODO put into subject and expose two observables?
-
-  private data: Map<string, Schueler[]>;
+  private data: ReplaySubject<Map<string, Schueler[]>> = new ReplaySubject();
 
   constructor() {
     this.parseExcel();
@@ -27,13 +27,8 @@ export class ReadExcelService {
     return {min: sortedCols[ 0 ], max: sortedCols[ sortedCols.length - 1 ]};
   }
 
-  getKlassen(): Set<string> { // TODO return undef if no data and handle in home cmp, also for other getter
-    return new Set(this.data.keys());
-  }
-
-  getKlasseWithSchueler(): Map<string, Schueler[]> {
-    return this.data;
-  }
+  klassen$: Observable<string[]> = this.data.asObservable().pipe(map(x => Array.from(x.keys())));
+  klassenWithSchueler$: Observable<Map<string, Schueler[]>> = this.data.asObservable();
 
   parseExcel(): void {
     // TODO only execute this when (valid) excel found
@@ -49,7 +44,7 @@ export class ReadExcelService {
     range.e.c = utils.decode_col(this.minmaxCols().max);
     const new_range = utils.encode_range(range);
 
-    this.data = utils.sheet_to_json(ws, {header: 'A', raw: false, range: new_range})
+    const data = utils.sheet_to_json(ws, {header: 'A', raw: false, range: new_range})
       .filter((_, index) => index !== 0)
       .map(schueler => ({
         vorname: schueler[ this.colLetter('vornameSpalte') ],
@@ -73,5 +68,7 @@ export class ReadExcelService {
         }
         return map;
       }, new Map<string, Schueler[]>());
+
+    this.data.next(data);
   }
 }

@@ -4,7 +4,7 @@
   <mat-form-field class="klasse">
     <mat-label>Klasse auswählen</mat-label>
     <mat-select [formControl]="selectedKlasseForm">
-      <mat-option *ngFor="let klasse of klassen" [value]="klasse">
+      <mat-option *ngFor="let klasse of klassenPool" [value]="klasse">
         {{klasse}}
       </mat-option>
     </mat-select>
