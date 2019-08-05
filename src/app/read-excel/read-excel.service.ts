@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { readFile, utils, WorkBook, WorkSheet } from 'xlsx';
 import { join } from 'path';
-import { Schueler } from '../schueler.model';
-
-type AOA = any[][];
+import { Schueler, SchuelerMitKlasse } from '../schueler.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,21 +10,25 @@ export class ReadExcelService {
 
   private readonly DATEFORMAT = 'dd"."mm"."yyyy';
 
-  private klassen: Set<string>;
-  private klasseMitSchuelern: Map<string, Schueler[]> = new Map();
+  private data: SchuelerMitKlasse[];
 
   constructor() {
     this.parseExcel();
   }
 
-  data: AOA = [ [1, 2], [3, 4] ];
-
-  getKlassen(): Set<string> {
-    return this.klassen;
+  getKlassen(): Set<string> { // TODO return undef if no data and handle in home cmp, also for other getter
+    return new Set(this.data.map(x => x.klasse));
   }
 
   getKlasseAndSchueler(): Map<string, Schueler[]> {
-    return this.klasseMitSchuelern;
+    const klasseMitSchuelern = new Map<string, Schueler[]>();
+    this.getKlassen().forEach(klasse => {
+      const schuelerGruppe = this.data
+        .filter(schueler => schueler.klasse === klasse)
+        .map(schueler => ({vorname: schueler.vorname, nachname: schueler.nachname, gebdatum: schueler.gebdatum}));
+      klasseMitSchuelern.set(klasse, schuelerGruppe);
+    });
+    return klasseMitSchuelern;
   }
 
   parseExcel(): void {
@@ -35,17 +37,8 @@ export class ReadExcelService {
       const wb: WorkBook = readFile(join(JSON.parse(window.localStorage.getItem('excelPath'))), {type: 'string', dateNF: this.DATEFORMAT});
       const ws: WorkSheet = wb.Sheets[ wb.SheetNames[ 0 ] ];
 
-      this.data = <AOA>(utils.sheet_to_json(ws, {header: 1,raw: false}));
-
-      // TODO move this to getters
-      this.klassen = new Set(this.data.filter((_, index) => index !== 0).map(x => x[ 3 ]));
-      this.klassen.forEach(klasse => {
-        const schueler = this.data
-          .filter((_, index) => index !== 0)
-          .filter(x => x[3] === klasse)
-          .map(x => ({vorname: x[ 0 ], nachname: x[1], gebdatum: x[2]}));
-        this.klasseMitSchuelern.set(klasse, schueler);
-      });
+      // use default header still, then map as wanted (or consider "A", then loop over first row to get relevant cols, then filter out everything not needed)
+      this.data = utils.sheet_to_json(ws, {header: ['vorname', 'nachname', 'gebdatum', 'klasse'],raw: false}).filter((_, index) => index !== 0) as SchuelerMitKlasse[];
     } else {
       console.log('wurstfinger');
     }

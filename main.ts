@@ -6,6 +6,8 @@ let win, serve;
 const args = process.argv.slice(1);
 serve = args.some(val => val === '--serve');
 
+// TODO check initial size of final app
+
 function createWindow() {
 
   const electronScreen = screen;
