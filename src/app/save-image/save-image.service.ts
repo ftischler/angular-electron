@@ -7,7 +7,18 @@ import * as fs from 'fs';
 })
 export class SaveImageService {
 
-  writeImage(image: string, name: string): void {
-    fs.writeFileSync(join(JSON.parse(window.localStorage.getItem('path')), name + '.png'), image, 'base64');
+  writeImage(image: string, classname: string, name: string): void {
+    this.createFolder(classname);
+    fs.writeFileSync(join(this.basepath, classname, name + '.png'), image, 'base64');
+  }
+
+  private get basepath() {
+    return JSON.parse(window.localStorage.getItem('picturePath'));
+  }
+
+  private createFolder(foldername: string) {
+    if (!fs.existsSync(join(this.basepath, foldername))) {
+      fs.mkdirSync(join(this.basepath, foldername));
+    }
   }
 }

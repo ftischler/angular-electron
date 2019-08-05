@@ -9,7 +9,7 @@ import { observeOn } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class ElectronEventService {
-  pathChange$: Observable<any> = fromEvent(ipcRenderer, 'change-path').pipe(
+  pathChange$: Observable<any> = fromEvent(ipcRenderer, 'change-paths').pipe(
     this.rxNgZoneScheduler.observeOnNgZone()
   );
 

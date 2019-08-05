@@ -8,16 +8,27 @@ import { FormControl, FormGroup } from '@angular/forms';
   styleUrls: ['./change-path.component.scss']
 })
 export class ChangePathComponent {
-  formGroup = new FormGroup({
-    input: new FormControl(JSON.parse(window.localStorage.getItem('path')))
+  form = new FormGroup({
+    picturePath: new FormControl(JSON.parse(window.localStorage.getItem('picturePath'))),
+    excelPath: new FormControl(JSON.parse(window.localStorage.getItem('excelPath')))
   });
+
+  // TODO hier könnte man noch die Excel datei Konfigurieren => in welcher spalte ist name, vorname und gebdatum
+
+  // TODO eine testmöglichkeit button wäre super, ob die excel datei gefunden wurde!
 
   constructor(private router: Router) {
   }
 
-  save() {
-    const value = this.formGroup.get('input').value;
-    window.localStorage.setItem('path', JSON.stringify(value));
+  save(e) {
+    e.preventDefault();
+    const picturePath = this.form.get('picturePath').value;
+    window.localStorage.setItem('picturePath', JSON.stringify(picturePath));
+
+    const excelPath = this.form.get('excelPath').value;
+    window.localStorage.setItem('excelPath', JSON.stringify(excelPath));
+
+    this.form.markAsPristine();
   }
 
   back() {

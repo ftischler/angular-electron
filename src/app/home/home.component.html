@@ -1,25 +1,30 @@
 <img class="logo" src="assets/BSS_Logo.png" alt="Berufliche Schulen Schramberg Logo">
 
-<form>
+<form [formGroup]="schuelerForm">
   <mat-form-field class="klasse">
-    <mat-label>Klasse</mat-label>
-    <mat-select>
+    <mat-label>Klasse auswählen</mat-label>
+    <mat-select [formControl]="selectedKlasseForm">
       <mat-option *ngFor="let klasse of klassen" [value]="klasse">
         {{klasse}}
       </mat-option>
     </mat-select>
+    <mat-hint>
+      Auswahl der Klasse mit ↑ / ↓ <br>
+      Auswahl der Schüler mit ← / →
+    </mat-hint>
+    <mat-error *ngIf="selectedKlasseForm.hasError('required')">Bitte wählen Sie zuerst eine Klasse aus.</mat-error>
   </mat-form-field>
 
   <mat-form-field class="vorname">
-    <input matInput disabled placeholder="Vorname" value="Max">
+    <input matInput formControlName="vorname" placeholder="Vorname">
   </mat-form-field>
 
   <mat-form-field class="nachname">
-    <input matInput disabled placeholder="Nachname" value="Mustermann">
+    <input matInput formControlName="nachname" placeholder="Nachname">
   </mat-form-field>
 
   <mat-form-field class="gebdatum">
-    <input matInput disabled placeholder="Geburtsdatum" value="01.01.1990">
+    <input matInput formControlName="gebdatum" placeholder="Geburtsdatum">
   </mat-form-field>
 </form>
 

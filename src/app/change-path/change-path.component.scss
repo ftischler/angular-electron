@@ -3,13 +3,17 @@ form {
   grid-template-columns: 1fr 1fr;
   grid-gap: 1em;
   margin: 2em;
-  max-width: 500px;
+  max-width: 600px;
 }
 
 mat-form-field {
   grid-column: span 2;
 }
 
+h1 {
+  margin: 0;
+}
+
 button {
-  grid-row: 2;
+  grid-row: 4;
 }
