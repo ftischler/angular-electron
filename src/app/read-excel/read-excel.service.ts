@@ -14,10 +14,6 @@ export class ReadExcelService {
 
   private data: ReplaySubject<Map<string, Schueler[]>> = new ReplaySubject();
 
-  constructor() {
-    this.parseExcel();
-  }
-
   colLetter(key: string): string {
     return JSON.parse(window.localStorage.getItem(key));
   }

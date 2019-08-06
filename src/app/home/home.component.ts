@@ -6,8 +6,9 @@ import { finalize, map, take, withLatestFrom } from 'rxjs/operators';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Schueler } from '../schueler.model';
 import _ from 'lodash';
+import { InitializeStorageService } from '../initialize-storage/initialize-storage.service';
 
-// TODO check if paths in config are set --> if not show a info message
+// TODO show info box to check einstellungen on first visit (main.ts -> event)
 
 @Component({
   selector: 'app-home',
@@ -61,10 +62,16 @@ export class HomeComponent implements OnInit {
   private readonly COUNTDOWN_FROM = 3;
   private canvasCtx: CanvasRenderingContext2D;
 
-  constructor(private saveImageService: SaveImageService, private readExcelService: ReadExcelService) {
-  }
+  constructor(
+    private initializeStorageService: InitializeStorageService,
+    private readExcelService: ReadExcelService,
+    private saveImageService: SaveImageService
+  ) {}
 
   ngOnInit() {
+    this.initializeStorageService.initializeAll();
+    this.readExcelService.parseExcel();
+
     this.selectedKlasseForm = new FormControl('', [Validators.required]);
     this.schuelerForm = new FormGroup({
       vorname: new FormControl({value: '', disabled: true}),
