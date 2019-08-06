@@ -58,8 +58,8 @@ export class HomeComponent implements OnInit {
   klassenPool: string[];
   schuelerPool: Schueler[];
 
+  readonly COUNTDOWN_FROM = 3;
   private readonly SQUARESIZE = 500;
-  private readonly COUNTDOWN_FROM = 3;
   private canvasCtx: CanvasRenderingContext2D;
 
   constructor(

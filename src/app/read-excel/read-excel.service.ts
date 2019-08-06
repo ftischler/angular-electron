@@ -28,6 +28,7 @@ export class ReadExcelService {
 
   parseExcel(): void {
     // TODO only execute this when (valid) excel found
+    // this is important, because if no excel file found, everything crashes, try/catch?
     const wb: WorkBook = readFile(join(JSON.parse(window.localStorage.getItem('excelPath'))), {
       type: 'string',
       dateNF: this.DATEFORMAT
