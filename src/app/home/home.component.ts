@@ -128,16 +128,21 @@ export class HomeComponent implements OnInit {
     this.canvasCtx.drawImage(this.webcamVideo.nativeElement, 0, 0, this.SQUARESIZE, this.SQUARESIZE);
   }
 
-  get filename(): string {
-    const {vorname, nachname, gebdatum} = this.schuelerForm.value;
-    return `${vorname}_${nachname}_${gebdatum}`;
+  get filenameName(): string {
+    const {vorname, nachname} = this.schuelerForm.value;
+    return `${nachname}_${vorname}`;
+  }
+
+  get filenameId(): string {
+    return this.schuelerForm.get('id').value;
   }
 
   saveImage(): void {
     if (this.selectedKlasseForm.valid) {
       const url = this.canvas.nativeElement.toDataURL('image/jpg', 0.8);
       const base64Data = url.replace(/^data:image\/png;base64,/, '');
-      this.saveImageService.writeImage(base64Data, this.selectedKlasseForm.value, this.filename);
+      this.saveImageService.writeImage(base64Data, this.selectedKlasseForm.value, this.filenameName);
+      this.saveImageService.writeImage(base64Data, this.selectedKlasseForm.value, this.filenameId);
     } else {
       this.selectedKlasseForm.markAsTouched();
     }
