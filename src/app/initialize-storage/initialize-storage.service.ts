@@ -1,4 +1,11 @@
 import { Injectable } from '@angular/core';
+import {
+  EXCEL_PATH_KEY, GEBDATUM_SPALTE_KEY,
+  ID_SPALTE_KEY, KLASSE_SPALTE_KEY,
+  NACHNAME_SPALTE_KEY,
+  PICTURE_PATH_KEY,
+  VORNAME_SPALTE_KEY
+} from '../localstorage-keys';
 
 // TODO weitere Fragen an Thomas Amann:
 // 1. in excel spalte name_3 evtl als zweitname doch zu berücksichtigen?
@@ -20,13 +27,13 @@ export class InitializeStorageService {
   private readonly DEFAULT_KLASSE_SPALTE = 'AF';
 
   initializeAll(): void {
-    this.initializeIfEmpty('picturePath', this.DEFAULT_PICTURE_PATH);
-    this.initializeIfEmpty('excelPath', this.DEFAULT_EXCEL_PATH);
-    this.initializeIfEmpty('idSpalte', this.DEFAULT_ID_SPALTE);
-    this.initializeIfEmpty('vornameSpalte', this.DEFAULT_VORNAME_SPALTE);
-    this.initializeIfEmpty('nachnameSpalte', this.DEFAULT_NACHNAME_SPALTE);
-    this.initializeIfEmpty('gebdatumSpalte', this.DEFAULT_GEBDATUM_SPALTE);
-    this.initializeIfEmpty('klasseSpalte', this.DEFAULT_KLASSE_SPALTE);
+    this.initializeIfEmpty(PICTURE_PATH_KEY, this.DEFAULT_PICTURE_PATH);
+    this.initializeIfEmpty(EXCEL_PATH_KEY, this.DEFAULT_EXCEL_PATH);
+    this.initializeIfEmpty(ID_SPALTE_KEY, this.DEFAULT_ID_SPALTE);
+    this.initializeIfEmpty(VORNAME_SPALTE_KEY, this.DEFAULT_VORNAME_SPALTE);
+    this.initializeIfEmpty(NACHNAME_SPALTE_KEY, this.DEFAULT_NACHNAME_SPALTE);
+    this.initializeIfEmpty(GEBDATUM_SPALTE_KEY, this.DEFAULT_GEBDATUM_SPALTE);
+    this.initializeIfEmpty(KLASSE_SPALTE_KEY, this.DEFAULT_KLASSE_SPALTE);
   }
 
   initializeIfEmpty(key: string, value: string): void {

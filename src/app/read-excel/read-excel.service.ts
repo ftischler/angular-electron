@@ -4,6 +4,14 @@ import { join } from 'path';
 import { Schueler } from '../schueler.model';
 import { Observable, ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
+import {
+  EXCEL_PATH_KEY,
+  GEBDATUM_SPALTE_KEY,
+  ID_SPALTE_KEY,
+  KLASSE_SPALTE_KEY,
+  NACHNAME_SPALTE_KEY,
+  VORNAME_SPALTE_KEY
+} from '../localstorage-keys';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +27,7 @@ export class ReadExcelService {
   }
 
   minmaxCols(): { min: string, max: string } {
-    const sortedCols = ['idSpalte', 'vornameSpalte', 'nachnameSpalte', 'gebdatumSpalte', 'klasseSpalte']
+    const sortedCols = [ID_SPALTE_KEY, VORNAME_SPALTE_KEY, NACHNAME_SPALTE_KEY, GEBDATUM_SPALTE_KEY, KLASSE_SPALTE_KEY]
       .map(key => this.colLetter(key))
       .sort((first: string, second: string) => parseInt(first, 36) - parseInt(second, 36));
     return {min: sortedCols[ 0 ], max: sortedCols[ sortedCols.length - 1 ]};
@@ -31,7 +39,7 @@ export class ReadExcelService {
   parseExcel(): void {
     // TODO only execute this when (valid) excel found
     // this is important, because if no excel file found, everything crashes, try/catch?
-    const wb: WorkBook = readFile(join(JSON.parse(window.localStorage.getItem('excelPath'))), {
+    const wb: WorkBook = readFile(join(JSON.parse(window.localStorage.getItem(EXCEL_PATH_KEY))), {
       type: 'string',
       dateNF: this.DATEFORMAT
     });
@@ -46,11 +54,11 @@ export class ReadExcelService {
     const data = utils.sheet_to_json(ws, {header: 'A', raw: false, range: new_range})
       .filter((_, index) => index !== 0)
       .map(schueler => ({
-        id: schueler[ this.colLetter('idSpalte') ],
-        vorname: schueler[ this.colLetter('vornameSpalte') ],
-        nachname: schueler[ this.colLetter('nachnameSpalte') ],
-        gebdatum: schueler[ this.colLetter('gebdatumSpalte') ],
-        klasse: schueler[ this.colLetter('klasseSpalte') ]
+        id: schueler[ this.colLetter(ID_SPALTE_KEY) ],
+        vorname: schueler[ this.colLetter(VORNAME_SPALTE_KEY) ],
+        nachname: schueler[ this.colLetter(NACHNAME_SPALTE_KEY) ],
+        gebdatum: schueler[ this.colLetter(GEBDATUM_SPALTE_KEY) ],
+        klasse: schueler[ this.colLetter(KLASSE_SPALTE_KEY) ]
       }))
       .reduce((map, schueler) => {
         if (map.has(schueler.klasse)) {
