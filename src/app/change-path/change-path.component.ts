@@ -16,6 +16,8 @@ import {
 })
 export class ChangePathComponent {
 
+  // TODO validierung einfügen!
+
   form = new FormGroup({
     picturePath: new FormControl(JSON.parse(window.localStorage.getItem(PICTURE_PATH_KEY))),
     excelPath: new FormControl(JSON.parse(window.localStorage.getItem(EXCEL_PATH_KEY))),

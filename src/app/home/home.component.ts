@@ -8,6 +8,7 @@ import { Schueler } from '../schueler.model';
 import { InitializeStorageService } from '../initialize-storage/initialize-storage.service';
 
 // TODO show info box to check einstellungen on first visit (main.ts -> event)
+// TODO was wenn excel zellen leer sind?
 
 @Component({
   selector: 'app-home',

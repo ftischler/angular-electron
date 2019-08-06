@@ -11,7 +11,8 @@ import {
 // 1. in excel spalte name_3 evtl als zweitname doch zu berücksichtigen?
 // 2. laufwerkpfad für a. bilder speicherort b. excel datei
 // 3. navigation mit pfeiltasten: rotation gewünscht, oder lieber nicht (sprung von letztem auf erstes)
-// 4.
+// 4. welche excel zellen können leer sein?
+// 5.
 
 @Injectable({
   providedIn: 'root'
