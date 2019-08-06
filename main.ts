@@ -7,6 +7,7 @@ const args = process.argv.slice(1);
 serve = args.some(val => val === '--serve');
 
 // TODO check initial size of final app window
+// TODO remove link to devtools in menu? (check!)
 
 function createWindow() {
 

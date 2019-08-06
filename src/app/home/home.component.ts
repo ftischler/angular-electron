@@ -5,7 +5,6 @@ import { Observable, timer } from 'rxjs';
 import { finalize, map, take, withLatestFrom } from 'rxjs/operators';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Schueler } from '../schueler.model';
-import _ from 'lodash';
 import { InitializeStorageService } from '../initialize-storage/initialize-storage.service';
 
 // TODO show info box to check einstellungen on first visit (main.ts -> event)
@@ -34,9 +33,9 @@ export class HomeComponent implements OnInit {
 
   @HostListener('document:keydown.arrowright') onArrowRight() {
     if (this.selectedKlasseForm.value) {
-      const selectedSchuelerIndex = this.schuelerPool.findIndex(schueler => _.isEqual(schueler, this.schuelerForm.value));
+      const selectedSchuelerIndex = this.schuelerPool.findIndex(schueler => schueler.id === this.schuelerForm.get('id').value);
       const nextSchueler = this.schuelerPool[ (selectedSchuelerIndex + 1) % this.schuelerPool.length ];
-      this.schuelerForm.setValue(nextSchueler);
+      this.schuelerForm.patchValue(nextSchueler);
     } else {
       this.selectedKlasseForm.markAsTouched();
     }
@@ -44,9 +43,9 @@ export class HomeComponent implements OnInit {
 
   @HostListener('document:keydown.arrowleft') onArrowLeft() {
     if (this.selectedKlasseForm.value) {
-      const selectedSchuelerIndex = this.schuelerPool.findIndex(schueler => _.isEqual(schueler, this.schuelerForm.value));
+      const selectedSchuelerIndex = this.schuelerPool.findIndex(schueler => schueler.id === this.schuelerForm.get('id').value);
       const nextSchueler = this.schuelerPool[ (selectedSchuelerIndex - 1) === -1 || (selectedSchuelerIndex === -1) ? this.schuelerPool.length - 1 : selectedSchuelerIndex - 1 ];
-      this.schuelerForm.setValue(nextSchueler);
+      this.schuelerForm.patchValue(nextSchueler);
     } else {
       this.selectedKlasseForm.markAsTouched();
     }
@@ -74,14 +73,14 @@ export class HomeComponent implements OnInit {
 
     this.selectedKlasseForm = new FormControl('', [Validators.required]);
     this.schuelerForm = new FormGroup({
+      id: new FormControl({value: '', disabled: true}),
       vorname: new FormControl({value: '', disabled: true}),
-      nachname: new FormControl({value: '', disabled: true}),
-      gebdatum: new FormControl({value: '', disabled: true})
+      nachname: new FormControl({value: '', disabled: true})
     });
 
     this.selectedKlasseForm.valueChanges.pipe(withLatestFrom(this.readExcelService.klassenWithSchueler$)).subscribe(([selectedKlasse, data]) => {
       this.schuelerPool = data.get(selectedKlasse);
-      this.schuelerForm.setValue(this.schuelerPool[ 0 ]);
+      this.schuelerForm.patchValue(this.schuelerPool[ 0 ]);
     });
 
     this.readExcelService.klassen$.subscribe(klassen => this.klassenPool = klassen);

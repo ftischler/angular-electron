@@ -5,6 +5,7 @@ form {
     'picturePath    picturePath'
     'excelPath      excelPath'
     'subtitle       subtitle'
+    'idSpalte       .'
     'vornameSpalte  nachnameSpalte'
     'gebdatumSpalte klasseSpalte'
     'backButton     saveButton' /
@@ -19,6 +20,7 @@ form {
       'picturePath'
       'excelPath'
       'subtitle'
+      'idSpalte'
       'vornameSpalte'
       'nachnameSpalte'
       'gebdatumSpalte'
@@ -45,6 +47,10 @@ h1 {
 h2 {
   grid-area: subtitle;
   margin-bottom: 0;
+}
+
+.idSpalte {
+  grid-area: idSpalte;
 }
 
 .vornameSpalte {

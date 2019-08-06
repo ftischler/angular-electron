@@ -9,9 +9,12 @@ import { FormControl, FormGroup } from '@angular/forms';
 })
 export class ChangePathComponent {
 
+  // TODO localstorage keys als konstanten auslagern
+
   form = new FormGroup({
     picturePath: new FormControl(JSON.parse(window.localStorage.getItem('picturePath'))),
     excelPath: new FormControl(JSON.parse(window.localStorage.getItem('excelPath'))),
+    idSpalte: new FormControl(JSON.parse(window.localStorage.getItem('idSpalte'))),
     vornameSpalte: new FormControl(JSON.parse(window.localStorage.getItem('vornameSpalte'))),
     nachnameSpalte: new FormControl(JSON.parse(window.localStorage.getItem('nachnameSpalte'))),
     gebdatumSpalte: new FormControl(JSON.parse(window.localStorage.getItem('gebdatumSpalte'))),

@@ -19,7 +19,9 @@ export class ReadExcelService {
   }
 
   minmaxCols(): { min: string, max: string } {
-    const sortedCols = ['vornameSpalte', 'nachnameSpalte', 'gebdatumSpalte', 'klasseSpalte'].map(key => this.colLetter(key)).sort();
+    const sortedCols = ['idSpalte', 'vornameSpalte', 'nachnameSpalte', 'gebdatumSpalte', 'klasseSpalte']
+      .map(key => this.colLetter(key))
+      .sort((first: string, second: string) => parseInt(first, 36) - parseInt(second, 36));
     return {min: sortedCols[ 0 ], max: sortedCols[ sortedCols.length - 1 ]};
   }
 
@@ -44,6 +46,7 @@ export class ReadExcelService {
     const data = utils.sheet_to_json(ws, {header: 'A', raw: false, range: new_range})
       .filter((_, index) => index !== 0)
       .map(schueler => ({
+        id: schueler[ this.colLetter('idSpalte') ],
         vorname: schueler[ this.colLetter('vornameSpalte') ],
         nachname: schueler[ this.colLetter('nachnameSpalte') ],
         gebdatum: schueler[ this.colLetter('gebdatumSpalte') ],
@@ -52,12 +55,14 @@ export class ReadExcelService {
       .reduce((map, schueler) => {
         if (map.has(schueler.klasse)) {
           map.get(schueler.klasse).push({
+            id: schueler.id,
             vorname: schueler.vorname,
             nachname: schueler.nachname,
             gebdatum: schueler.gebdatum
           });
         } else {
           map.set(schueler.klasse, [{
+            id: schueler.id,
             vorname: schueler.vorname,
             nachname: schueler.nachname,
             gebdatum: schueler.gebdatum
