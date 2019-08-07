@@ -11,13 +11,10 @@ import { takeUntil } from 'rxjs/operators';
 export class AppComponent implements OnInit, OnDestroy {
   private destroy$$ = new Subject();
 
-  constructor(public electronEventService: ElectronEventService, private router: Router) {
-  }
+  constructor(public electronEventService: ElectronEventService, private router: Router) {}
 
   ngOnInit(): void {
-    this.electronEventService.pathChange$.pipe(
-      takeUntil(this.destroy$$)
-    ).subscribe(async () => {
+    this.electronEventService.pathChange$.pipe(takeUntil(this.destroy$$)).subscribe(async () => {
       await this.router.navigate(['changepath']);
     });
   }

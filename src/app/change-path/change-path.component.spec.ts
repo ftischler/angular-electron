@@ -8,9 +8,8 @@ describe('ChangePathComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ChangePathComponent ]
-    })
-    .compileComponents();
+      declarations: [ChangePathComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

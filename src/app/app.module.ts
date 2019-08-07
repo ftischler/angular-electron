@@ -14,10 +14,7 @@ import { MatButtonModule } from '@angular/material';
 import { RxNgZoneSchedulerModule } from 'ngx-rxjs-zone-scheduler';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    HomeComponent
-  ],
+  declarations: [AppComponent, HomeComponent],
   imports: [
     BrowserModule,
     ReactiveFormsModule,
@@ -31,5 +28,4 @@ import { RxNgZoneSchedulerModule } from 'ngx-rxjs-zone-scheduler';
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule {
-}
+export class AppModule {}

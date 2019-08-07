@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import {
-  EXCEL_PATH_KEY, GEBDATUM_SPALTE_KEY,
-  ID_SPALTE_KEY, KLASSE_SPALTE_KEY,
+  EXCEL_PATH_KEY,
+  GEBDATUM_SPALTE_KEY,
+  ID_SPALTE_KEY,
+  KLASSE_SPALTE_KEY,
   NACHNAME_SPALTE_KEY,
   PICTURE_PATH_KEY,
   VORNAME_SPALTE_KEY
@@ -12,13 +14,12 @@ import {
 // 2. laufwerkpfad für a. bilder speicherort b. excel datei
 // 3. navigation mit pfeiltasten: rotation gewünscht, oder lieber nicht (sprung von letztem auf erstes)
 // 4. welche excel zellen können leer sein?
-// 5.
+// 5. wirklich immer zwei dateien? sind alle felder immer befüllt?
 
 @Injectable({
   providedIn: 'root'
 })
 export class InitializeStorageService {
-
   private readonly DEFAULT_PICTURE_PATH = '/Users/alexanderschuster/Desktop';
   private readonly DEFAULT_EXCEL_PATH = '/Users/alexanderschuster/Desktop/Atlantis_Schülerliste.xlsx';
   private readonly DEFAULT_ID_SPALTE = 'A';

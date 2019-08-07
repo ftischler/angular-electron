@@ -17,25 +17,31 @@ import { InitializeStorageService } from '../initialize-storage/initialize-stora
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HomeComponent implements OnInit {
-  @ViewChild('webcam', {static: true}) webcamVideo: ElementRef<HTMLVideoElement>;
-  @ViewChild('canvas', {static: true}) canvas: ElementRef<HTMLCanvasElement>;
+  @ViewChild('webcam', { static: true }) webcamVideo: ElementRef<HTMLVideoElement>;
+  @ViewChild('canvas', { static: true }) canvas: ElementRef<HTMLCanvasElement>;
 
   @HostListener('document:keydown.arrowdown') onArrowDown() {
     const selectedKlasseIndex = this.klassenPool.findIndex(klasse => klasse === this.selectedKlasseForm.value);
-    const nextKlasse = this.klassenPool[ (selectedKlasseIndex + 1) % this.klassenPool.length ];
+    const nextKlasse = this.klassenPool[(selectedKlasseIndex + 1) % this.klassenPool.length];
     this.selectedKlasseForm.setValue(nextKlasse);
   }
 
   @HostListener('document:keydown.arrowup') onArrowUp() {
     const selectedKlasseIndex = this.klassenPool.findIndex(klasse => klasse === this.selectedKlasseForm.value);
-    const nextKlasse = this.klassenPool[ (selectedKlasseIndex - 1) === -1 || (selectedKlasseIndex === -1) ? this.klassenPool.length - 1 : selectedKlasseIndex - 1 ];
+    const nextKlasse = this.klassenPool[
+      selectedKlasseIndex - 1 === -1 || selectedKlasseIndex === -1
+        ? this.klassenPool.length - 1
+        : selectedKlasseIndex - 1
+    ];
     this.selectedKlasseForm.setValue(nextKlasse);
   }
 
   @HostListener('document:keydown.arrowright') onArrowRight() {
     if (this.selectedKlasseForm.value) {
-      const selectedSchuelerIndex = this.schuelerPool.findIndex(schueler => schueler.id === this.schuelerForm.get('id').value);
-      const nextSchueler = this.schuelerPool[ (selectedSchuelerIndex + 1) % this.schuelerPool.length ];
+      const selectedSchuelerIndex = this.schuelerPool.findIndex(
+        schueler => schueler.id === this.schuelerForm.get('id').value
+      );
+      const nextSchueler = this.schuelerPool[(selectedSchuelerIndex + 1) % this.schuelerPool.length];
       this.schuelerForm.patchValue(nextSchueler);
     } else {
       this.selectedKlasseForm.markAsTouched();
@@ -44,8 +50,14 @@ export class HomeComponent implements OnInit {
 
   @HostListener('document:keydown.arrowleft') onArrowLeft() {
     if (this.selectedKlasseForm.value) {
-      const selectedSchuelerIndex = this.schuelerPool.findIndex(schueler => schueler.id === this.schuelerForm.get('id').value);
-      const nextSchueler = this.schuelerPool[ (selectedSchuelerIndex - 1) === -1 || (selectedSchuelerIndex === -1) ? this.schuelerPool.length - 1 : selectedSchuelerIndex - 1 ];
+      const selectedSchuelerIndex = this.schuelerPool.findIndex(
+        schueler => schueler.id === this.schuelerForm.get('id').value
+      );
+      const nextSchueler = this.schuelerPool[
+        selectedSchuelerIndex - 1 === -1 || selectedSchuelerIndex === -1
+          ? this.schuelerPool.length - 1
+          : selectedSchuelerIndex - 1
+      ];
       this.schuelerForm.patchValue(nextSchueler);
     } else {
       this.selectedKlasseForm.markAsTouched();
@@ -74,17 +86,19 @@ export class HomeComponent implements OnInit {
 
     this.selectedKlasseForm = new FormControl('', [Validators.required]);
     this.schuelerForm = new FormGroup({
-      id: new FormControl({value: '', disabled: true}),
-      vorname: new FormControl({value: '', disabled: true}),
-      nachname: new FormControl({value: '', disabled: true})
+      id: new FormControl({ value: '', disabled: true }),
+      vorname: new FormControl({ value: '', disabled: true }),
+      nachname: new FormControl({ value: '', disabled: true })
     });
 
-    this.selectedKlasseForm.valueChanges.pipe(withLatestFrom(this.readExcelService.klassenWithSchueler$)).subscribe(([selectedKlasse, data]) => {
-      this.schuelerPool = data.get(selectedKlasse);
-      this.schuelerForm.patchValue(this.schuelerPool[ 0 ]);
-    });
+    this.selectedKlasseForm.valueChanges
+      .pipe(withLatestFrom(this.readExcelService.klassenWithSchueler$))
+      .subscribe(([selectedKlasse, data]) => {
+        this.schuelerPool = data.get(selectedKlasse);
+        this.schuelerForm.patchValue(this.schuelerPool[0]);
+      });
 
-    this.readExcelService.klassen$.subscribe(klassen => this.klassenPool = klassen);
+    this.readExcelService.klassen$.subscribe(klassen => (this.klassenPool = klassen));
 
     const webcamConfig = {
       audio: false,
@@ -93,15 +107,16 @@ export class HomeComponent implements OnInit {
           maxHeight: this.SQUARESIZE,
           maxWidth: this.SQUARESIZE,
           minHeight: this.SQUARESIZE,
-          minWidth: this.SQUARESIZE,
+          minWidth: this.SQUARESIZE
         }
       }
     };
 
     navigator.getUserMedia(
       webcamConfig as any,
-      stream => this.webcamVideo.nativeElement.srcObject = stream,
-      error => console.error(error));
+      stream => (this.webcamVideo.nativeElement.srcObject = stream),
+      error => console.error(error)
+    );
   }
 
   capture(): void {
@@ -130,7 +145,7 @@ export class HomeComponent implements OnInit {
   }
 
   get filenameName(): string {
-    const {vorname, nachname} = this.schuelerForm.value;
+    const { vorname, nachname } = this.schuelerForm.value;
     return `${nachname}_${vorname}`;
   }
 

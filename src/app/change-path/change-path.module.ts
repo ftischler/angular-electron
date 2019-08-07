@@ -12,7 +12,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     ReactiveFormsModule,
     MatInputModule,
     MatCheckboxModule,
-    RouterModule.forChild([{path: '', component: ChangePathComponent}])
+    RouterModule.forChild([{ path: '', component: ChangePathComponent }])
   ]
 })
-export class ChangePathModule { }
+export class ChangePathModule {}

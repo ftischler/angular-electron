@@ -17,7 +17,6 @@ import {
   providedIn: 'root'
 })
 export class ReadExcelService {
-
   private readonly DATEFORMAT = 'dd"."mm"."yyyy';
 
   private data: ReplaySubject<Map<string, Schueler[]>> = new ReplaySubject();
@@ -26,11 +25,11 @@ export class ReadExcelService {
     return JSON.parse(window.localStorage.getItem(key));
   }
 
-  minmaxCols(): { min: string, max: string } {
+  minmaxCols(): { min: string; max: string } {
     const sortedCols = [ID_SPALTE_KEY, VORNAME_SPALTE_KEY, NACHNAME_SPALTE_KEY, GEBDATUM_SPALTE_KEY, KLASSE_SPALTE_KEY]
       .map(key => this.colLetter(key))
       .sort((first: string, second: string) => parseInt(first, 36) - parseInt(second, 36));
-    return {min: sortedCols[ 0 ], max: sortedCols[ sortedCols.length - 1 ]};
+    return { min: sortedCols[0], max: sortedCols[sortedCols.length - 1] };
   }
 
   klassen$: Observable<string[]> = this.data.asObservable().pipe(map(x => Array.from(x.keys())));
@@ -43,22 +42,23 @@ export class ReadExcelService {
       type: 'string',
       dateNF: this.DATEFORMAT
     });
-    const ws: WorkSheet = wb.Sheets[ wb.SheetNames[ 0 ] ];
+    const ws: WorkSheet = wb.Sheets[wb.SheetNames[0]];
 
     // limit range to the needed columns
-    let range = utils.decode_range(ws[ '!ref' ]);
+    let range = utils.decode_range(ws['!ref']);
     range.s.c = utils.decode_col(this.minmaxCols().min);
     range.e.c = utils.decode_col(this.minmaxCols().max);
     const new_range = utils.encode_range(range);
 
-    const data = utils.sheet_to_json(ws, {header: 'A', raw: false, range: new_range})
+    const data = utils
+      .sheet_to_json(ws, { header: 'A', raw: false, range: new_range })
       .filter((_, index) => index !== 0)
       .map(schueler => ({
-        id: schueler[ this.colLetter(ID_SPALTE_KEY) ],
-        vorname: schueler[ this.colLetter(VORNAME_SPALTE_KEY) ],
-        nachname: schueler[ this.colLetter(NACHNAME_SPALTE_KEY) ],
-        gebdatum: schueler[ this.colLetter(GEBDATUM_SPALTE_KEY) ],
-        klasse: schueler[ this.colLetter(KLASSE_SPALTE_KEY) ]
+        id: schueler[this.colLetter(ID_SPALTE_KEY)],
+        vorname: schueler[this.colLetter(VORNAME_SPALTE_KEY)],
+        nachname: schueler[this.colLetter(NACHNAME_SPALTE_KEY)],
+        gebdatum: schueler[this.colLetter(GEBDATUM_SPALTE_KEY)],
+        klasse: schueler[this.colLetter(KLASSE_SPALTE_KEY)]
       }))
       .reduce((map, schueler) => {
         if (map.has(schueler.klasse)) {
@@ -69,12 +69,14 @@ export class ReadExcelService {
             gebdatum: schueler.gebdatum
           });
         } else {
-          map.set(schueler.klasse, [{
-            id: schueler.id,
-            vorname: schueler.vorname,
-            nachname: schueler.nachname,
-            gebdatum: schueler.gebdatum
-          }]);
+          map.set(schueler.klasse, [
+            {
+              id: schueler.id,
+              vorname: schueler.vorname,
+              nachname: schueler.nachname,
+              gebdatum: schueler.gebdatum
+            }
+          ]);
         }
         return map;
       }, new Map<string, Schueler[]>());

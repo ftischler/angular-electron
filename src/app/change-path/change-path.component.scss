@@ -76,3 +76,7 @@ h2 {
 .save {
   grid-area: saveButton;
 }
+
+.save[disabled] {
+  opacity: 0.5;
+}
