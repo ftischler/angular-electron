@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
-import { SaveImageService } from './save-image.service';
+import { ReadWriteImageService } from './read-write-image.service';
 
 describe('SaveImageService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
   it('should be created', () => {
-    const service: SaveImageService = TestBed.get(SaveImageService);
+    const service: ReadWriteImageService = TestBed.get(ReadWriteImageService);
     expect(service).toBeTruthy();
   });
 });

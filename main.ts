@@ -1,13 +1,10 @@
-import { app, BrowserWindow, screen, Menu } from 'electron';
+import { app, BrowserWindow, screen, Menu, globalShortcut } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 
 let win, serve;
 const args = process.argv.slice(1);
 serve = args.some(val => val === '--serve');
-
-// TODO check initial size of final app window
-// TODO remove link to devtools in menu? (check!)
 
 function createWindow() {
 
@@ -62,7 +59,7 @@ try {
 
     const menu = Menu.buildFromTemplate([
       {
-        label: 'Electron',
+        label: 'Anwendung',
         submenu:[
           {role: 'close'},
           {type: 'separator'},
@@ -74,7 +71,6 @@ try {
         submenu:[
           {role: 'reload'},
           {role: 'forcereload'},
-          {role: 'toggledevtools'},
           {type: 'separator'},
           {role: 'zoomin'},
           {role: 'zoomout'},
@@ -113,6 +109,10 @@ try {
       },
     ]);
     Menu.setApplicationMenu(menu);
+
+    globalShortcut.register('CommandOrControl+Alt+i', () => {
+      win.webContents.openDevTools();
+    })
   });
 
   // Quit when all windows are closed.

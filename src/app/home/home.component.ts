@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
-import { SaveImageService } from '../save-image/save-image.service';
+import { ReadWriteImageService } from '../read-write-image/read-write-image.service';
 import { ReadExcelService } from '../read-excel/read-excel.service';
 import { Observable, timer } from 'rxjs';
 import { finalize, map, take, withLatestFrom } from 'rxjs/operators';
@@ -81,7 +81,7 @@ export class HomeComponent implements OnInit {
   constructor(
     private initializeStorageService: InitializeStorageService,
     private readExcelService: ReadExcelService,
-    private saveImageService: SaveImageService
+    private saveImageService: ReadWriteImageService
   ) {}
 
   ngOnInit() {
@@ -129,6 +129,7 @@ export class HomeComponent implements OnInit {
 
   private loadExistingImage() {
     try {
+      // TODO try to read both? -> depends on if both images are always created or not
       const base64img = this.saveImageService.readImage(this.selectedKlasseForm.value, this.filenameName);
       const img = new Image();
       img.onload = () => {
@@ -176,9 +177,8 @@ export class HomeComponent implements OnInit {
   saveImage(): void {
     if (this.selectedKlasseForm.valid) {
       const url = this.canvas.nativeElement.toDataURL('image/jpg', 0.8);
-      const base64Data = url.replace(/^data:image\/png;base64,/, '');
-      this.saveImageService.writeImage(base64Data, this.selectedKlasseForm.value, this.filenameName);
-      this.saveImageService.writeImage(base64Data, this.selectedKlasseForm.value, this.filenameId);
+      this.saveImageService.writeImage(url, this.selectedKlasseForm.value, this.filenameName);
+      this.saveImageService.writeImage(url, this.selectedKlasseForm.value, this.filenameId);
     } else {
       this.selectedKlasseForm.markAsTouched();
     }

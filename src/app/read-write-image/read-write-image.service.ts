@@ -6,10 +6,11 @@ import { PICTURE_PATH_KEY } from '../localstorage-keys';
 @Injectable({
   providedIn: 'root'
 })
-export class SaveImageService {
+export class ReadWriteImageService {
   writeImage(image: string, classname: string, name: string): void {
+    const base64Data = image.replace(/^data:image\/png;base64,/, '');
     this.createFolder(classname);
-    fs.writeFileSync(join(this.basepath, classname, name + '.png'), image, 'base64');
+    fs.writeFileSync(join(this.basepath, classname, name + '.png'), base64Data, 'base64');
   }
 
   readImage(classname: string, name: string): string {
