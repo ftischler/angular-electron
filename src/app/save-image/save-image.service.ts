@@ -12,6 +12,10 @@ export class SaveImageService {
     fs.writeFileSync(join(this.basepath, classname, name + '.png'), image, 'base64');
   }
 
+  readImage(classname: string, name: string): string {
+    return 'data:image/png;base64,' + fs.readFileSync(join(this.basepath, classname, name + '.png'), 'base64');
+  }
+
   private get basepath() {
     return JSON.parse(window.localStorage.getItem(PICTURE_PATH_KEY));
   }

@@ -9,6 +9,10 @@ import { InitializeStorageService } from '../initialize-storage/initialize-stora
 
 // TODO show info box to check einstellungen on first visit (main.ts -> event)
 // TODO was wenn excel zellen leer sind?
+// TODO erneute aufnahme nicht erlauben, wenn schon ein bild genommen wurde
+// TODO loading previously taken img also when other schueler is selected
+// TODO gebdatum input und abfrage ob übereinstimmung mit --> nur dann abspeichern
+// TODO evtl. excel datei inhalt in localstorage/indexeddb cachen
 
 @Component({
   selector: 'app-home',
@@ -84,6 +88,8 @@ export class HomeComponent implements OnInit {
     this.initializeStorageService.initializeAll();
     this.readExcelService.parseExcel();
 
+    this.canvasCtx = this.canvas.nativeElement.getContext('2d');
+
     this.selectedKlasseForm = new FormControl('', [Validators.required]);
     this.schuelerForm = new FormGroup({
       id: new FormControl({ value: '', disabled: true }),
@@ -96,6 +102,8 @@ export class HomeComponent implements OnInit {
       .subscribe(([selectedKlasse, data]) => {
         this.schuelerPool = data.get(selectedKlasse);
         this.schuelerForm.patchValue(this.schuelerPool[0]);
+
+        this.loadExistingImage();
       });
 
     this.readExcelService.klassen$.subscribe(klassen => (this.klassenPool = klassen));
@@ -119,6 +127,19 @@ export class HomeComponent implements OnInit {
     );
   }
 
+  private loadExistingImage() {
+    try {
+      const base64img = this.saveImageService.readImage(this.selectedKlasseForm.value, this.filenameName);
+      const img = new Image();
+      img.onload = () => {
+        this.canvasCtx.drawImage(img, 0, 0, this.SQUARESIZE, this.SQUARESIZE);
+      };
+      img.src = base64img;
+    } catch (e) {
+      this.canvasCtx.clearRect(0, 0, this.SQUARESIZE, this.SQUARESIZE);
+    }
+  }
+
   capture(): void {
     this.drawImage();
     this.saveImage();
@@ -140,7 +161,6 @@ export class HomeComponent implements OnInit {
   }
 
   drawImage(): void {
-    this.canvasCtx = this.canvas.nativeElement.getContext('2d');
     this.canvasCtx.drawImage(this.webcamVideo.nativeElement, 0, 0, this.SQUARESIZE, this.SQUARESIZE);
   }
 
