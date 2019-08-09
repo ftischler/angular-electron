@@ -32,7 +32,7 @@
     <mat-datepicker-toggle matSuffix [for]="myDatepicker"></mat-datepicker-toggle>
     <mat-datepicker #myDatepicker startView="multi-year" [startAt]="START_DATEPICKER"></mat-datepicker>
     <mat-hint>
-      Bitte geben Sie Ihr Geburtsdatum an, um das Foto abzuspeichern.
+      Bitte geben Sie Ihr Geburtsdatum an, um das Foto aufnehmen zu können.
     </mat-hint>
     <mat-error *ngIf="gebdatumForm.hasError('required')">Bitte geben Sie Ihr Geburtsdatum ein.</mat-error>
   </mat-form-field>

@@ -17,6 +17,8 @@ import { InitializeStorageService } from '../initialize-storage/initialize-stora
 import { isEqual } from 'date-fns';
 
 // TODO performance bei viel daten in excel messen!! -> evtl. excel datei inhalt in localstorage/indexeddb cachen
+// keine unnötigen aufrufe, trotzdem performance bei viel mehr daten prüfen
+
 // TODO evtl. zusätzliches dropdown für namen (vorname nachname zusammen)?
 
 // TODO test this shit
@@ -124,6 +126,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.initializeStorageService.initializeAll();
+
     this.readExcelService.parseExcel();
 
     this.canvasCtx = this.canvas.nativeElement.getContext('2d');
