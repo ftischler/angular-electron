@@ -12,14 +12,18 @@ import {
   NACHNAME_SPALTE_KEY,
   VORNAME_SPALTE_KEY
 } from '../localstorage-keys';
+import { MatSnackBar } from '@angular/material';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReadExcelService {
-  private readonly DATEFORMAT = 'dd"."mm"."yyyy';
+  private readonly DATEFORMAT = 'YYYY/MM/DD';
 
   private data: ReplaySubject<Map<string, Schueler[]>> = new ReplaySubject();
+
+  constructor(private snackBar: MatSnackBar) {
+  }
 
   colLetter(key: string): string {
     return JSON.parse(window.localStorage.getItem(key));
@@ -36,51 +40,55 @@ export class ReadExcelService {
   klassenWithSchueler$: Observable<Map<string, Schueler[]>> = this.data.asObservable();
 
   parseExcel(): void {
-    // TODO only execute this when (valid) excel found
-    // this is important, because if no excel file found, everything crashes, try/catch?
-    const wb: WorkBook = readFile(join(JSON.parse(window.localStorage.getItem(EXCEL_PATH_KEY))), {
-      type: 'string',
-      dateNF: this.DATEFORMAT
-    });
-    const ws: WorkSheet = wb.Sheets[wb.SheetNames[0]];
+    try {
+      const wb: WorkBook = readFile(join(JSON.parse(window.localStorage.getItem(EXCEL_PATH_KEY))), {
+        type: 'string',
+        dateNF: this.DATEFORMAT
+      });
+      const ws: WorkSheet = wb.Sheets[wb.SheetNames[0]];
 
-    // limit range to the needed columns
-    let range = utils.decode_range(ws['!ref']);
-    range.s.c = utils.decode_col(this.minmaxCols().min);
-    range.e.c = utils.decode_col(this.minmaxCols().max);
-    const new_range = utils.encode_range(range);
+      // limit range to the needed columns
+      let range = utils.decode_range(ws['!ref']);
+      range.s.c = utils.decode_col(this.minmaxCols().min);
+      range.e.c = utils.decode_col(this.minmaxCols().max);
+      const new_range = utils.encode_range(range);
 
-    const data = utils
-      .sheet_to_json(ws, { header: 'A', raw: false, range: new_range })
-      .filter((_, index) => index !== 0)
-      .map(schueler => ({
-        id: schueler[this.colLetter(ID_SPALTE_KEY)],
-        vorname: schueler[this.colLetter(VORNAME_SPALTE_KEY)],
-        nachname: schueler[this.colLetter(NACHNAME_SPALTE_KEY)],
-        gebdatum: schueler[this.colLetter(GEBDATUM_SPALTE_KEY)],
-        klasse: schueler[this.colLetter(KLASSE_SPALTE_KEY)]
-      }))
-      .reduce((map, schueler) => {
-        if (map.has(schueler.klasse)) {
-          map.get(schueler.klasse).push({
-            id: schueler.id,
-            vorname: schueler.vorname,
-            nachname: schueler.nachname,
-            gebdatum: schueler.gebdatum
-          });
-        } else {
-          map.set(schueler.klasse, [
-            {
+      const data = utils
+        .sheet_to_json(ws, { header: 'A', raw: false, range: new_range })
+        .filter((_, index) => index !== 0)
+        .map(schueler => ({
+          id: schueler[this.colLetter(ID_SPALTE_KEY)],
+          vorname: schueler[this.colLetter(VORNAME_SPALTE_KEY)],
+          nachname: schueler[this.colLetter(NACHNAME_SPALTE_KEY)],
+          gebdatum: new Date(schueler[this.colLetter(GEBDATUM_SPALTE_KEY)]),
+          klasse: schueler[this.colLetter(KLASSE_SPALTE_KEY)]
+        }))
+        .reduce((map, schueler) => {
+          if (map.has(schueler.klasse)) {
+            map.get(schueler.klasse).push({
               id: schueler.id,
               vorname: schueler.vorname,
               nachname: schueler.nachname,
               gebdatum: schueler.gebdatum
-            }
-          ]);
-        }
-        return map;
-      }, new Map<string, Schueler[]>());
+            });
+          } else {
+            map.set(schueler.klasse, [
+              {
+                id: schueler.id,
+                vorname: schueler.vorname,
+                nachname: schueler.nachname,
+                gebdatum: schueler.gebdatum
+              }
+            ]);
+          }
+          return map;
+        }, new Map<string, Schueler[]>());
 
-    this.data.next(data);
+      this.data.next(data);
+      this.snackBar.dismiss();
+    } catch(e) {
+      this.snackBar.open('Die Excel Datei mit den Schülerdaten kann nicht gelesen werden. ' +
+        'Bitte öffnen Sie die Einstellungen und stellen Sie sicher, dass die Datei in dem Laufwerk liegt, das Sie dort angegeben haben.', 'x');
+    }
   }
 }

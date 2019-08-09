@@ -15,6 +15,9 @@ import {
 // 3. navigation mit pfeiltasten: rotation gewünscht, oder lieber nicht (sprung von letztem auf erstes)
 // 4. welche excel zellen können leer sein?
 // 5. wirklich immer zwei dateien? sind alle felder immer befüllt?
+// 6. bei Wechsel des Schülers -> vorheriges gebdatum automatisch löschen, damit der nächste schüler das gebdatum des letzten nicht sieht?
+// 7. soll bei noch nicht ausgewähltem schüler und richtigem passwort der 'aufnehmen' button "disabled" werden, oder das aufnehmen zum rumspielen
+//       möglich bleiben, nur ohne zu speichern?
 
 @Injectable({
   providedIn: 'root'

@@ -45,8 +45,6 @@ export class ChangePathComponent {
     ])
   });
 
-  // TODO eine testmöglichkeit button wäre super, ob die excel datei gefunden wurde!
-
   constructor(private router: Router) {}
 
   save(e) {
