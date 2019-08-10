@@ -23,10 +23,10 @@ import { DateFnsDateAdapter } from './util/date-fns-date-adapter.service';
 
 export const MAT_DATE_FNS_DATE_FORMATS = {
   parse: {
-    dateInput: 'dd.MM.yy'
+    dateInput: 'dd.MM.yyyy'
   },
   display: {
-    dateInput: 'dd.MM.yyyy',
+    dateInput: 'dd.MM.yy',
     monthYearLabel: 'LLL y',
     dateA11yLabel: 'MMMM d, y',
     monthYearA11yLabel: 'MMMM y'

@@ -23,6 +23,8 @@ import { isEqual } from 'date-fns';
 
 // TODO test this shit
 
+// TODO bug: arrow left/right navigation when datepicker is selected doesn't work atm -> idea: only execute arrow*Navigation when not datepicker selected
+
 // 3 states
 // 1. saved picture available (try von loadExistingImageIfExisting) => aufnehmen + timer, but disabled
 // 2. form not valid (klasse ausgewählt und gebdatum ausgewählt -> formsValid(cb)) => gespeichert mit check icon
@@ -245,6 +247,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   gebdatumEnteredCorrectly(): boolean {
+    // TODO check why this is executed three times!
     const enteredGebdatum = this.gebdatumForm.value;
     const correctGebdatum = this.schuelerForm.get('gebdatum').value;
     if (enteredGebdatum && correctGebdatum) {
