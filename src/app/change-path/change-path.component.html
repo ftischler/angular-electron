@@ -1,6 +1,7 @@
 
 <form (submit)="save($event)" [formGroup]="form">
   <h1>Einstellungen</h1>
+  <p>Version: {{version}}</p>
   <mat-form-field class="picturePath">
     <input matInput formControlName="picturePath" placeholder="Pfad wo die Klassen-Ordner mit den Bildern gespeichert werden sollen" type="text">
     <mat-error *ngIf="picturePathControl.hasError('required')">
@@ -30,22 +31,22 @@
     </mat-error>
   </mat-form-field>
 
-  <mat-form-field class="vornameSpalte">
-    <input matInput formControlName="vornameSpalte" placeholder="Vorname" type="text">
-    <mat-error *ngIf="vornameControl.hasError('pattern') && !vornameControl.hasError('required')">
-      Bitte geben Sie eine gültige Excel-Spaltennummer ein, z.B. A, D, AF, usw.
-    </mat-error>
-    <mat-error *ngIf="vornameControl.hasError('required')">
-      Bitte geben Sie eine Excel-Spaltennummer ein.
-    </mat-error>
-  </mat-form-field>
-
   <mat-form-field class="nachnameSpalte">
     <input matInput formControlName="nachnameSpalte" placeholder="Nachname" type="text">
     <mat-error *ngIf="nachnameControl.hasError('pattern') && !nachnameControl.hasError('required')">
       Bitte geben Sie eine gültige Excel-Spaltennummer ein, z.B. A, D, AF, usw.
     </mat-error>
     <mat-error *ngIf="nachnameControl.hasError('required')">
+      Bitte geben Sie eine Excel-Spaltennummer ein.
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field class="vornameSpalte">
+    <input matInput formControlName="vornameSpalte" placeholder="Vorname" type="text">
+    <mat-error *ngIf="vornameControl.hasError('pattern') && !vornameControl.hasError('required')">
+      Bitte geben Sie eine gültige Excel-Spaltennummer ein, z.B. A, D, AF, usw.
+    </mat-error>
+    <mat-error *ngIf="vornameControl.hasError('required')">
       Bitte geben Sie eine Excel-Spaltennummer ein.
     </mat-error>
   </mat-form-field>

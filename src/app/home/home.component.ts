@@ -10,7 +10,7 @@ import {
 import { ReadWriteImageService } from '../read-write-image/read-write-image.service';
 import { ReadExcelService } from '../read-excel/read-excel.service';
 import { Observable, Subject, Subscription, timer } from 'rxjs';
-import { finalize, map, take, takeUntil, withLatestFrom } from 'rxjs/operators';
+import { distinctUntilChanged, finalize, map, take, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Schueler } from '../schueler.model';
 import { InitializeStorageService } from '../initialize-storage/initialize-storage.service';
@@ -24,6 +24,14 @@ import { isEqual } from 'date-fns';
 // TODO test this shit
 
 // TODO bug: arrow left/right navigation when datepicker is selected doesn't work atm -> idea: only execute arrow*Navigation when not datepicker selected
+
+// TODO bug: year comparison not working when year not entered with 4 digits
+
+// TODO lizenzrechte? schule gehört nicht der schule, sondern nur das benutzungsrecht.
+
+// TODO offenes dropdown feld grösser
+
+// (TODO was tun bei gleichem namen in der gleichen klasse)
 
 // 3 states
 // 1. saved picture available (try von loadExistingImageIfExisting) => aufnehmen + timer, but disabled
@@ -157,7 +165,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.gebdatumForm.reset();
     });
 
-    this.gebdatumForm.valueChanges.pipe(takeUntil(this.destroy$$)).subscribe(() => {
+    this.gebdatumForm.valueChanges.pipe(distinctUntilChanged(), takeUntil(this.destroy$$)).subscribe(() => {
       this.canTakePictureDisabled = !this.gebdatumEnteredCorrectly();
     });
 

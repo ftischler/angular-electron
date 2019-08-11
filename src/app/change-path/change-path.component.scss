@@ -1,12 +1,12 @@
 form {
   display: grid;
   grid-template:
-    'title          title'
+    'title          version'
     'picturePath    picturePath'
     'excelPath      excelPath'
     'subtitle       subtitle'
     'idSpalte       .'
-    'vornameSpalte  nachnameSpalte'
+    'nachnameSpalte  vornameSpalte'
     'gebdatumSpalte klasseSpalte'
     'backButton     saveButton' /
     1fr             1fr;
@@ -17,12 +17,13 @@ form {
   @media(max-width: 500px) {
     grid-template:
       'title'
+      'version'
       'picturePath'
       'excelPath'
       'subtitle'
       'idSpalte'
-      'vornameSpalte'
       'nachnameSpalte'
+      'vornameSpalte'
       'gebdatumSpalte'
       'klasseSpalte'
       'backButton'
@@ -34,6 +35,16 @@ form {
 h1 {
   grid-area: title;
   margin: 0;
+}
+
+p {
+  grid-area: version;
+  margin: 0;
+  justify-self: end;
+
+  @media(max-width: 500px) {
+    justify-self: start;
+  }
 }
 
 .picturePath {

@@ -13,14 +13,16 @@
       </mat-option>
     </mat-select>
     <mat-hint>
-      Auswahl der Klasse mit ↑ / ↓ <br>
-      Auswahl der Schüler mit ← / →
+      Auswahl der Klasse mit ↑ / ↓
     </mat-hint>
     <mat-error *ngIf="selectedKlasseForm.hasError('required')">Bitte wählen Sie zuerst eine Klasse aus.</mat-error>
   </mat-form-field>
 
   <mat-form-field class="vorname">
     <input matInput formControlName="vorname" placeholder="Vorname">
+    <mat-hint>
+      Auswahl der Schüler mit ← / →
+    </mat-hint>
   </mat-form-field>
 
   <mat-form-field class="nachname">

@@ -10,6 +10,7 @@ import {
   PICTURE_PATH_KEY,
   VORNAME_SPALTE_KEY
 } from '../localstorage-keys';
+import { AppConfig } from '../../environments/environment';
 
 @Component({
   selector: 'app-change-path',
@@ -17,6 +18,7 @@ import {
   styleUrls: ['./change-path.component.scss']
 })
 export class ChangePathComponent {
+  version;
   form = new FormGroup({
     picturePath: new FormControl(JSON.parse(window.localStorage.getItem(PICTURE_PATH_KEY)), [Validators.required]),
     excelPath: new FormControl(JSON.parse(window.localStorage.getItem(EXCEL_PATH_KEY)), [
@@ -45,7 +47,9 @@ export class ChangePathComponent {
     ])
   });
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+    this.version  = AppConfig.version;
+  }
 
   save(e) {
     e.preventDefault();

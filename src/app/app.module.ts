@@ -26,7 +26,7 @@ export const MAT_DATE_FNS_DATE_FORMATS = {
     dateInput: 'dd.MM.yyyy'
   },
   display: {
-    dateInput: 'dd.MM.yy',
+    dateInput: 'dd.MM.yyyy',
     monthYearLabel: 'LLL y',
     dateA11yLabel: 'MMMM d, y',
     monthYearA11yLabel: 'MMMM y'
