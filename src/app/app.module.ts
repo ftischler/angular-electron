@@ -8,6 +8,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MomentDateAdapter, MomentDateModule } from '@angular/material-moment-adapter';
 import {
   DateAdapter,
   MAT_DATE_FORMATS,
@@ -16,22 +17,20 @@ import {
   MatCardModule,
   MatDatepickerModule,
   MatInputModule,
-  MatNativeDateModule,
   MatSelectModule,
   MatSnackBarModule
 } from '@angular/material';
 import { RxNgZoneSchedulerModule } from 'ngx-rxjs-zone-scheduler';
-import { DateFnsDateAdapter } from './util/date-fns-date-adapter.service';
 
-export const MAT_DATE_FNS_DATE_FORMATS = {
+export const MY_FORMATS = {
   parse: {
-    dateInput: 'dd.MM.yyyy'
+    dateInput: 'DD.MM.YYYY'
   },
   display: {
-    dateInput: 'dd.MM.yyyy',
-    monthYearLabel: 'LLL y',
-    dateA11yLabel: 'MMMM d, y',
-    monthYearA11yLabel: 'MMMM y'
+    dateInput: 'DD.MM.YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY'
   }
 };
 
@@ -48,22 +47,17 @@ export const MAT_DATE_FNS_DATE_FORMATS = {
     MatButtonModule,
     MatCardModule,
     MatDatepickerModule,
-    MatNativeDateModule,
+    MomentDateModule,
     MatSnackBarModule,
     RxNgZoneSchedulerModule
   ],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'de-DE' },
-    {
-      provide: DateAdapter,
-      useClass: DateFnsDateAdapter
-    },
-    {
-      provide: MAT_DATE_FORMATS,
-      useValue: MAT_DATE_FNS_DATE_FORMATS
-    },
+    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
     { provide: LOCALE_ID, useValue: 'de-DE' }
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule {
+}

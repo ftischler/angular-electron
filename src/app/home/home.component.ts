@@ -11,16 +11,12 @@ import { ReadWriteImageService } from '../read-write-image/read-write-image.serv
 import { ReadExcelService } from '../read-excel/read-excel.service';
 import { Observable, Subject, timer } from 'rxjs';
 import { distinctUntilChanged, filter, finalize, map, take, takeUntil, withLatestFrom } from 'rxjs/operators';
-import { AbstractControl, Form, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Schueler } from '../schueler.model';
 import { InitializeStorageService } from '../initialize-storage/initialize-storage.service';
-import { isEqual } from 'date-fns';
-import { Key } from 'readline';
+import * as moment from 'moment';
 
 // TODO test this shit
-
-// TODO bug: year comparison not working when year not entered with 4 digits
-// try momentjs
 
 // TODO don't disable aufnehmen button from the start, but show error message (set whole form touched?)
 // also show correct message below schueler profile
@@ -296,11 +292,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (enteredGebdatum) {
       console.log('eingegebenes Geburtsdatum: ', enteredGebdatum);
     }
-    if (enteredGebdatum && correctGebdatum) {
-      return isEqual(enteredGebdatum, correctGebdatum);
-    } else {
-      return false;
-    }
+    return enteredGebdatum && correctGebdatum ? moment(enteredGebdatum).isSame(correctGebdatum) : false;
   }
 
   get filenameName(): string {
