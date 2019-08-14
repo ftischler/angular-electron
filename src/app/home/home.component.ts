@@ -18,8 +18,7 @@ import * as moment from 'moment';
 
 // TODO test this shit
 
-// TODO don't disable aufnehmen button from the start, but show error message (set whole form touched?)
-// also show correct message below schueler profile
+// TODO add info msg below buttons, to tell user what to do next!
 
 // TODO vor Testauslieferung: lizenzrechte? schule gehört nicht der schule, sondern nur das benutzungsrecht.
 
@@ -45,7 +44,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   @ViewChild('canvas', { static: true }) canvas: ElementRef<HTMLCanvasElement>;
 
   @HostListener('document:keydown.arrowdown', ['$event']) onArrowDown(event: KeyboardEvent) {
-    if (event.target instanceof HTMLBodyElement) {
+    if (event.target instanceof HTMLBodyElement) { // TODO maybe swap this with everything except dropdowns or select
       this.arrowDownNavigation();
     }
   }
@@ -116,6 +115,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   klassenPool: string[];
   schuelerPool: Schueler[];
 
+  pictureTaken = false;
   canTakePictureDisabled = true;
 
   readonly COUNTDOWN_FROM = 3;
@@ -208,6 +208,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.canvasCtx.drawImage(img, 0, 0, this.SQUARE_PICTURE, this.SQUARE_PICTURE);
       };
       img.src = base64img;
+      this.pictureTaken = true;
     } catch (e) {
       this.clearCanvas();
     }
@@ -215,6 +216,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private clearCanvas() {
     this.canvasCtx.clearRect(0, 0, this.SQUARE_PICTURE, this.SQUARE_PICTURE);
+    this.pictureTaken = false;
   }
 
   get klasseControl(): AbstractControl {
@@ -246,6 +248,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (this.formsValid()) {
       this.drawImage();
       this.saveImage();
+      this.pictureTaken = true;
     }
   }
 
@@ -261,11 +264,6 @@ export class HomeComponent implements OnInit, OnDestroy {
         })
       );
     }
-  }
-
-  delete(): void {
-    this.clearCanvas();
-    this.klasseControl.markAsUntouched();
   }
 
   drawImage(): void {
