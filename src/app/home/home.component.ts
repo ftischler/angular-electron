@@ -22,11 +22,10 @@ import { Key } from 'readline';
 // TODO bug: year comparison not working when year not entered with 4 digits
 // try momentjs
 
-// TODO offenes dropdown feld grösser (länger)
+// TODO don't disable aufnehmen button from the start, but show error message (set whole form touched?)
+// also show correct message below schueler profile
 
 // TODO vor Testauslieferung: lizenzrechte? schule gehört nicht der schule, sondern nur das benutzungsrecht.
-
-// TODO vor Testauslieferung: viele beschriftete console.logs, um besser helfen zu können
 
 // TODO feature: aus excel datei auch geschlecht auslesen -> musterfoto für männer/frauen unterschiedlich
 
@@ -37,7 +36,7 @@ import { Key } from 'readline';
 // 2. form not valid (klasse ausgewählt und gebdatum ausgewählt -> formsValid(cb)) => gespeichert mit check icon
 // 3. can actually take picture => aufnehmen + timer (active)
 
-type saveBtnStatus = 'a' | 'b';
+// type saveBtnStatus = 'a' | 'b';
 
 @Component({
   selector: 'app-home',
@@ -57,8 +56,9 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private arrowDownNavigation() {
     const selectedKlasseIndex = this.klassenPool.findIndex(klasse => klasse === this.klasseControl.value);
-    const nextKlasse = this.klassenPool[ (selectedKlasseIndex + 1) % this.klassenPool.length ];
-    this.klasseControl.setValue(nextKlasse);
+    if (selectedKlasseIndex + 1 < this.klassenPool.length) {
+      this.klasseControl.setValue(this.klassenPool[selectedKlasseIndex + 1]);
+    }
   }
 
   @HostListener('document:keydown.arrowup', ['$event']) onArrowUp(event: KeyboardEvent) {
@@ -69,12 +69,9 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private arrowUpNavigation() {
     const selectedKlasseIndex = this.klassenPool.findIndex(klasse => klasse === this.klasseControl.value);
-    const nextKlasse = this.klassenPool[
-      selectedKlasseIndex - 1 === -1 || selectedKlasseIndex === -1
-        ? this.klassenPool.length - 1
-        : selectedKlasseIndex - 1
-      ];
-    this.klasseControl.setValue(nextKlasse);
+    if (selectedKlasseIndex - 1 >= 0) {
+      this.klasseControl.setValue(this.klassenPool[selectedKlasseIndex - 1]);
+    }
   }
 
   @HostListener('document:keydown.arrowright', ['$event']) onArrowRight(event: KeyboardEvent) {
@@ -88,8 +85,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       const selectedSchuelerIndex = this.schuelerPool.findIndex(
         schueler => schueler.id === this.schuelerControl.value.id
       );
-      const nextSchueler = this.schuelerPool[ (selectedSchuelerIndex + 1) % this.schuelerPool.length ];
-      this.schuelerControl.patchValue(nextSchueler);
+      if (selectedSchuelerIndex +1 < this.schuelerPool.length) {
+        this.schuelerControl.patchValue(this.schuelerPool[selectedSchuelerIndex + 1]);
+      }
     } else {
       this.klasseControl.markAsTouched();
     }
@@ -106,19 +104,16 @@ export class HomeComponent implements OnInit, OnDestroy {
       const selectedSchuelerIndex = this.schuelerPool.findIndex(
         schueler => schueler.id === this.schuelerControl.value.id
       );
-      const nextSchueler = this.schuelerPool[
-        selectedSchuelerIndex - 1 === -1 || selectedSchuelerIndex === -1
-          ? this.schuelerPool.length - 1
-          : selectedSchuelerIndex - 1
-        ];
-      this.schuelerControl.patchValue(nextSchueler);
+      if (selectedSchuelerIndex - 1 >= 0) {
+        this.schuelerControl.patchValue(this.schuelerPool[ selectedSchuelerIndex - 1 ]);
+      }
     } else {
       this.klasseControl.markAsTouched();
     }
   }
 
   countdown$: Observable<number>;
-  saveBtnState$: Observable<saveBtnStatus>; // TODO use this to manage save btn state reactively
+  // saveBtnState$: Observable<saveBtnStatus>; // TODO use this to manage save btn state reactively
 
   schuelerForm: FormGroup;
 
@@ -130,7 +125,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   readonly COUNTDOWN_FROM = 3;
   readonly START_DATEPICKER = new Date(2005, 0, 1);
   private readonly SQUARE_CAMERA = 500;
-  private readonly SQUARE_PICTURE = 400;
+  readonly SQUARE_PICTURE = 400;
   private canvasCtx: CanvasRenderingContext2D;
 
   private destroy$$ = new Subject<void>();
@@ -139,8 +134,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     private initializeStorageService: InitializeStorageService,
     private readExcelService: ReadExcelService,
     private saveImageService: ReadWriteImageService
-  ) {
-  }
+  ) {}
 
   ngOnInit() {
     this.initializeStorageService.initializeAll();
@@ -151,34 +145,43 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.schuelerForm = new FormGroup({
       klasse: new FormControl('', [Validators.required]),
-      schueler: new FormControl({value: '', disabled: true}, [Validators.required]),
+      schueler: new FormControl({ value: '', disabled: true }, [Validators.required]),
       gebdatum: new FormControl({ value: '', disabled: true }, [Validators.required])
     });
 
     this.klasseControl.valueChanges
-      .pipe(withLatestFrom(this.readExcelService.klassenWithSchueler$), distinctUntilChanged(), takeUntil(this.destroy$$))
+      .pipe(
+        withLatestFrom(this.readExcelService.klassenWithSchueler$),
+        distinctUntilChanged(),
+        takeUntil(this.destroy$$)
+      )
       .subscribe(([selectedKlasse, data]) => {
         this.schuelerPool = data.get(selectedKlasse);
         this.schuelerControl.enable();
         this.schuelerControl.setValue(this.schuelerPool[0]);
       });
 
-    this.schuelerControl.valueChanges.pipe(
-      filter(schueler => !!schueler),
-      distinctUntilChanged(),
-      takeUntil(this.destroy$$)
-    ).subscribe(
-      schueler => {
-        console.log('schueler: ', schueler.gebdatum); // TODO remove this
+    this.schuelerControl.valueChanges
+      .pipe(
+        filter(schueler => !!schueler),
+        distinctUntilChanged(),
+        takeUntil(this.destroy$$)
+      )
+      .subscribe(schueler => {
+        console.log('korrektes gebdatum: ', schueler.gebdatum);
         this.loadImageIfExisting();
         this.gebdatumControl.enable();
         this.gebdatumControl.reset();
-      }
-    );
+      });
 
-    this.gebdatumControl.valueChanges.pipe(distinctUntilChanged(), takeUntil(this.destroy$$)).subscribe(() => {
-      this.canTakePictureDisabled = !this.gebdatumEnteredCorrectly();
-    });
+    this.gebdatumControl.valueChanges
+      .pipe(
+        distinctUntilChanged(), // TODO idea: use map instead of logic in subscribe and turn into observable, also combinelatest with schueler valuechanges
+        takeUntil(this.destroy$$)
+      )
+      .subscribe(() => {
+        this.canTakePictureDisabled = !this.gebdatumEnteredCorrectly();
+      });
 
     this.readExcelService.klassen$.subscribe(klassen => (this.klassenPool = klassen));
 
@@ -235,9 +238,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   get displayName(): string {
-    const {vorname, nachname} = this.schuelerControl.value;
+    const { vorname, nachname } = this.schuelerControl.value;
     if (this.schuelerSelected()) {
-      return `${vorname} ${nachname}`;
+      return `${nachname}, ${vorname}`;
     } else {
       return '';
     }
@@ -251,7 +254,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   timedCapture(): void {
-    if (this.formsValid()) { // TODO change this since it's probably not necessary in this way anymore
+    if (this.formsValid()) {
+      // TODO change this since it's probably not necessary in this way anymore
       this.countdown$ = timer(0, 1000).pipe(
         take(this.COUNTDOWN_FROM + 1),
         map(i => this.COUNTDOWN_FROM - i),
@@ -289,6 +293,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   gebdatumEnteredCorrectly(): boolean {
     const enteredGebdatum = this.gebdatumControl.value;
     const correctGebdatum = this.schuelerControl.value.gebdatum;
+    if (enteredGebdatum) {
+      console.log('eingegebenes Geburtsdatum: ', enteredGebdatum);
+    }
     if (enteredGebdatum && correctGebdatum) {
       return isEqual(enteredGebdatum, correctGebdatum);
     } else {
@@ -306,7 +313,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   saveImage(): void {
-    const url = this.canvas.nativeElement.toDataURL('image/jpg', 0.8);
+    const url = this.canvas.nativeElement.toDataURL('image/jpg', 0.9);
     this.saveImageService.writeImage(url, this.klasseControl.value, this.filenameName);
     this.saveImageService.writeImage(url, this.klasseControl.value, this.filenameId);
   }

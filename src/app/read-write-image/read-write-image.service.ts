@@ -10,7 +10,11 @@ export class ReadWriteImageService {
   writeImage(image: string, classname: string, name: string): void {
     const base64Data = image.replace(/^data:image\/png;base64,/, '');
     this.createFolder(classname);
-    fs.writeFileSync(join(this.basepath, classname, name + '.png'), base64Data, 'base64');
+    try {
+      fs.writeFileSync(join(this.basepath, classname, name + '.png'), base64Data, 'base64');
+    } catch (e) {
+      console.log('write file sync failed.', e);
+    }
   }
 
   readImage(classname: string, name: string): string {
@@ -22,8 +26,12 @@ export class ReadWriteImageService {
   }
 
   private createFolder(foldername: string) {
-    if (!fs.existsSync(join(this.basepath, foldername))) {
-      fs.mkdirSync(join(this.basepath, foldername));
+    try {
+      if (!fs.existsSync(join(this.basepath, foldername))) {
+        fs.mkdirSync(join(this.basepath, foldername));
+      }
+    } catch (e) {
+      console.log('create folder function failed.', e);
     }
   }
 }

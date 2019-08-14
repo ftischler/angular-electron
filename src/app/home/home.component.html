@@ -14,10 +14,10 @@
   </mat-form-field>
 
   <mat-form-field class="schueler">
-    <mat-label>Vorname/Nachname auswählen</mat-label>
+    <mat-label>Nachname, Vorname auswählen</mat-label>
     <mat-select formControlName="schueler">
       <mat-option *ngFor="let schueler of schuelerPool" [value]="schueler">
-        {{schueler.vorname}} {{schueler.nachname}}
+        {{schueler.nachname}}, {{schueler.vorname}}
       </mat-option>
     </mat-select>
     <mat-error *ngIf="schuelerControl.hasError('required')">Bitte wählen Sie einen Schüler aus.</mat-error>
@@ -40,7 +40,7 @@
   </mat-card-header>
   <figure mat-card-image>
     <img src="assets/persona.jpg" alt="Musterbild">
-    <canvas width="400" height="400" #canvas></canvas>
+    <canvas [width]="SQUARE_PICTURE" [height]="SQUARE_PICTURE" #canvas></canvas>
   </figure>
 <!--  fix this-->
   <mat-card-content *ngIf="false">

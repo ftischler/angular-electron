@@ -22,8 +22,7 @@ export class ReadExcelService {
 
   private data: ReplaySubject<Map<string, Schueler[]>> = new ReplaySubject();
 
-  constructor(private snackBar: MatSnackBar) {
-  }
+  constructor(private snackBar: MatSnackBar) {}
 
   colLetter(key: string): string {
     return JSON.parse(window.localStorage.getItem(key));
@@ -36,8 +35,8 @@ export class ReadExcelService {
     return { min: sortedCols[0], max: sortedCols[sortedCols.length - 1] };
   }
 
-  klassen$: Observable<string[]> = this.data.asObservable().pipe(map(x => Array.from(x.keys())));
-  klassenWithSchueler$: Observable<Map<string, Schueler[]>> = this.data.asObservable();
+  klassen$: Observable<string[]> = this.data.pipe(map(x => Array.from(x.keys())));
+  klassenWithSchueler$: Observable<Map<string, Schueler[]>> = this.data;
 
   parseExcel(): void {
     try {
@@ -47,7 +46,7 @@ export class ReadExcelService {
       });
       const ws: WorkSheet = wb.Sheets[wb.SheetNames[0]];
 
-      // limit range to the needed columns
+      // limit range to the needed columns for performance reasons
       let range = utils.decode_range(ws['!ref']);
       range.s.c = utils.decode_col(this.minmaxCols().min);
       range.e.c = utils.decode_col(this.minmaxCols().max);
@@ -60,7 +59,9 @@ export class ReadExcelService {
           id: schueler[this.colLetter(ID_SPALTE_KEY)],
           vorname: schueler[this.colLetter(VORNAME_SPALTE_KEY)],
           nachname: schueler[this.colLetter(NACHNAME_SPALTE_KEY)],
-          gebdatum: new Date(schueler[this.colLetter(GEBDATUM_SPALTE_KEY)]),
+          gebdatum: schueler[this.colLetter(GEBDATUM_SPALTE_KEY)]
+            ? new Date(schueler[this.colLetter(GEBDATUM_SPALTE_KEY)])
+            : new Date(2000, 0, 1),
           klasse: schueler[this.colLetter(KLASSE_SPALTE_KEY)]
         }))
         .reduce((map, schueler) => {
@@ -84,11 +85,15 @@ export class ReadExcelService {
           return map;
         }, new Map<string, Schueler[]>());
 
+      console.log('data from excel: ', data);
       this.data.next(data);
       this.snackBar.dismiss();
-    } catch(e) {
-      this.snackBar.open('Die Excel Datei mit den Schülerdaten kann nicht gelesen werden. ' +
-        'Bitte öffnen Sie die Einstellungen und stellen Sie sicher, dass die Datei in dem Laufwerk liegt, das Sie dort angegeben haben.', 'x');
+    } catch (e) {
+      this.snackBar.open(
+        'Die Excel Datei mit den Schülerdaten kann nicht gelesen werden. ' +
+          'Bitte öffnen Sie die Einstellungen und stellen Sie sicher, dass die Datei in dem Laufwerk liegt, das Sie dort angegeben haben.',
+        'x'
+      );
     }
   }
 }

@@ -66,5 +66,4 @@ export const MAT_DATE_FNS_DATE_FORMATS = {
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule {
-}
+export class AppModule {}

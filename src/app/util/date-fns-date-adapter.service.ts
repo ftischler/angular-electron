@@ -1,7 +1,20 @@
 import { Injectable } from '@angular/core';
 import { DateAdapter } from '@angular/material';
-import { addDays, addMonths, addYears, format, getDate, getDaysInMonth, getMonth, getYear, parse, setDay, setMonth, toDate } from 'date-fns';
-import { de as locale } from "date-fns/locale";
+import {
+  addDays,
+  addMonths,
+  addYears,
+  format,
+  getDate,
+  getDaysInMonth,
+  getMonth,
+  getYear,
+  parse,
+  setDay,
+  setMonth,
+  toDate
+} from 'date-fns';
+import { de as locale } from 'date-fns/locale';
 
 const WEEK_STARTS_ON = 1; // 0 sunday, 1 monday...
 
@@ -20,7 +33,6 @@ function range(start: number, end: number): number[] {
 
 @Injectable()
 export class DateFnsDateAdapter extends DateAdapter<Date> {
-
   addCalendarDays(date: Date, days: number): Date {
     return addDays(date, days);
   }
@@ -69,9 +81,11 @@ export class DateFnsDateAdapter extends DateAdapter<Date> {
     let formatStr = map[style];
     let date = new Date();
 
-    return range(0, 6).map(month => format(setDay(date, month), formatStr, {
-      locale
-    }));
+    return range(0, 6).map(month =>
+      format(setDay(date, month), formatStr, {
+        locale
+      })
+    );
   }
 
   getFirstDayOfWeek(): number {
@@ -92,9 +106,11 @@ export class DateFnsDateAdapter extends DateAdapter<Date> {
     let formatStr = map[style];
     let date = new Date();
 
-    return range(0, 11).map(month => format(setMonth(date, month), formatStr, {
-      locale
-    }));
+    return range(0, 11).map(month =>
+      format(setMonth(date, month), formatStr, {
+        locale
+      })
+    );
   }
 
   getNumDaysInMonth(date: Date): number {
@@ -125,7 +141,7 @@ export class DateFnsDateAdapter extends DateAdapter<Date> {
 
   parse(value: any, parseFormat: any): Date | null {
     return parse(value, parseFormat, new Date(), {
-      locale,
+      locale
     });
   }
 

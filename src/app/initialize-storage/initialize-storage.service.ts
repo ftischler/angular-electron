@@ -13,8 +13,9 @@ import {
   providedIn: 'root'
 })
 export class InitializeStorageService {
-  private readonly DEFAULT_PICTURE_PATH = '/Users/alexanderschuster/Desktop';
-  private readonly DEFAULT_EXCEL_PATH = '/Users/alexanderschuster/Desktop/Atlantis_Schülerliste.xlsx';
+  // TODO test this on windows
+  private readonly DEFAULT_PICTURE_PATH = 'c:\\Schuelerfotos\\';
+  private readonly DEFAULT_EXCEL_PATH = 'c:\\Schuelerfotos\\Atlantis_Schülerliste.xlsx';
   private readonly DEFAULT_ID_SPALTE = 'A';
   private readonly DEFAULT_VORNAME_SPALTE = 'D';
   private readonly DEFAULT_NACHNAME_SPALTE = 'C';

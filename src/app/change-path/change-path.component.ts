@@ -48,7 +48,7 @@ export class ChangePathComponent {
   });
 
   constructor(private router: Router) {
-    this.version  = AppConfig.version;
+    this.version = AppConfig.version;
   }
 
   save(e) {
