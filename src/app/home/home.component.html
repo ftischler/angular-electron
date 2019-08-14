@@ -1,77 +1,70 @@
+<h1 hidden="true">Password App</h1>
+
 <img class="logo" src="assets/BSS_Logo.png" alt="Berufliche Schulen Schramberg Logo">
 
 <form [formGroup]="schuelerForm">
   <mat-form-field class="klasse">
     <mat-label>Klasse auswählen</mat-label>
-    <mat-select [formControl]="selectedKlasseForm"
-                (keydown.arrowUp)="overwriteUp($event)"
-                (keydown.arrowDown)="overwriteDown($event)"
-                (keydown.arrowLeft)="overwriteLeft($event)"
-                (keydown.arrowRight)="overwriteRight($event)">
+    <mat-select formControlName="klasse">
       <mat-option *ngFor="let klasse of klassenPool" [value]="klasse">
         {{klasse}}
       </mat-option>
     </mat-select>
-    <mat-hint>
-      Auswahl der Klasse mit ↑ / ↓
-    </mat-hint>
-    <mat-error *ngIf="selectedKlasseForm.hasError('required')">Bitte wählen Sie zuerst eine Klasse aus.</mat-error>
+    <mat-error *ngIf="klasseControl.hasError('required')">Bitte wählen Sie zuerst eine Klasse aus.</mat-error>
   </mat-form-field>
 
-  <mat-form-field class="vorname">
-    <input matInput formControlName="vorname" placeholder="Vorname">
-    <mat-hint>
-      Auswahl der Schüler mit ← / →
-    </mat-hint>
-  </mat-form-field>
-
-  <mat-form-field class="nachname">
-    <input matInput formControlName="nachname" placeholder="Nachname">
+  <mat-form-field class="schueler">
+    <mat-label>Vorname/Nachname auswählen</mat-label>
+    <mat-select formControlName="schueler">
+      <mat-option *ngFor="let schueler of schuelerPool" [value]="schueler">
+        {{schueler.vorname}} {{schueler.nachname}}
+      </mat-option>
+    </mat-select>
+    <mat-error *ngIf="schuelerControl.hasError('required')">Bitte wählen Sie einen Schüler aus.</mat-error>
   </mat-form-field>
 
   <mat-form-field class="gebdatum">
-    <input matInput [formControl]="gebdatumForm" [matDatepicker]="myDatepicker" placeholder="Geburtsdatum">
+    <input matInput formControlName="gebdatum" [matDatepicker]="myDatepicker" placeholder="Geburtsdatum">
     <mat-datepicker-toggle matSuffix [for]="myDatepicker"></mat-datepicker-toggle>
     <mat-datepicker #myDatepicker startView="multi-year" [startAt]="START_DATEPICKER"></mat-datepicker>
     <mat-hint>
       Bitte geben Sie Ihr Geburtsdatum an, um das Foto aufnehmen zu können.
     </mat-hint>
-    <mat-error *ngIf="gebdatumForm.hasError('required')">Bitte geben Sie Ihr Geburtsdatum ein.</mat-error>
+    <mat-error *ngIf="gebdatumControl.hasError('required')">Bitte geben Sie Ihr Geburtsdatum ein.</mat-error>
   </mat-form-field>
 </form>
 
-<figure class="foto">
-  <figcaption>Nehmen Sie ein Foto, bei dem Ihr Gesicht gut zu sehen ist.</figcaption>
-  <figure class="musterbild">
+<mat-card role="region">
+  <mat-card-header>
+    <mat-card-title>{{displayName}}</mat-card-title>
+  </mat-card-header>
+  <figure mat-card-image>
     <img src="assets/persona.jpg" alt="Musterbild">
-    <figcaption>Kamera wird geladen...</figcaption>
+    <canvas width="400" height="400" #canvas></canvas>
   </figure>
-  <video autoplay #webcam></video>
-  <canvas width="500" height="500" #canvas></canvas>
-  <div class="capture-grp" *ngIf="canTakePicture; else pictureSaved">
-    <button class="capture-btn btn--icon" [disabled]="canTakePictureDisabled" (click)="capture()">
-      <ng-container>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>
-        Aufnehmen
-      </ng-container>
-    </button>
-    <button [disabled]="canTakePictureDisabled" class="timer-btn" mat-icon-button aria-label="Starte Timer, der in 3 Sekunden ein Foto aufnimmt" title="Aufnehmen in {{COUNTDOWN_FROM}} Sekunden" (click)="timedCapture()">
-      <ng-container *ngIf="countdown$ | async as countdown; else showIcon">
-        {{countdown}}
-      </ng-container>
-      <ng-template #showIcon>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
-      </ng-template>
-    </button>
+<!--  fix this-->
+  <mat-card-content *ngIf="false">
+    <p>Das Foto wurde erfolgreich gespeichert! Wenn Sie es mit einem neuen Foto ersetzen wollen, drücken Sie bitte erneut auf 'Aufnehmen'.</p>
+  </mat-card-content>
+</mat-card>
+
+<figure class="foto">
+  <figcaption hidden="true">Take a picture using your webcam.</figcaption>
+  <div class="video-placeholder">
+    Kamera wird geladen...
   </div>
-  <ng-template #pictureSaved>
-    <button class="btn--icon">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
-      Gespeichert
-    </button>
-  </ng-template>
-  <button class="delete-btn btn--icon" (click)="delete()">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5l-1-1h-5l-1 1H5v2h14V4z"/><path fill="none" d="M0 0h24v24H0V0z"/></svg>
-    Löschen
+  <video autoplay #webcam></video>
+  <button class="capture-btn btn--icon" [disabled]="canTakePictureDisabled" (click)="capture()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>
+    Aufnehmen
+  </button>
+  <button class="timer-btn btn--icon" [disabled]="canTakePictureDisabled" (click)="timedCapture()">
+    <ng-container *ngIf="countdown$ | async as countdown; else showIcon">
+      {{countdown}}
+    </ng-container>
+    <ng-template #showIcon>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+      Aufnehmen in {{COUNTDOWN_FROM}}s
+    </ng-template>
   </button>
 </figure>

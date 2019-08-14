@@ -1,7 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ElementRef, HostBinding,
+  ElementRef,
   HostListener,
   OnDestroy,
   OnInit,
@@ -9,34 +9,35 @@ import {
 } from '@angular/core';
 import { ReadWriteImageService } from '../read-write-image/read-write-image.service';
 import { ReadExcelService } from '../read-excel/read-excel.service';
-import { Observable, Subject, Subscription, timer } from 'rxjs';
-import { distinctUntilChanged, finalize, map, take, takeUntil, withLatestFrom } from 'rxjs/operators';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Observable, Subject, timer } from 'rxjs';
+import { distinctUntilChanged, filter, finalize, map, take, takeUntil, withLatestFrom } from 'rxjs/operators';
+import { AbstractControl, Form, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Schueler } from '../schueler.model';
 import { InitializeStorageService } from '../initialize-storage/initialize-storage.service';
 import { isEqual } from 'date-fns';
-
-// TODO performance bei viel daten in excel messen!! -> evtl. excel datei inhalt in localstorage/indexeddb cachen
-// keine unnötigen aufrufe, trotzdem performance bei viel mehr daten prüfen
-
-// TODO evtl. zusätzliches dropdown für namen (vorname nachname zusammen)?
+import { Key } from 'readline';
 
 // TODO test this shit
 
-// TODO bug: arrow left/right navigation when datepicker is selected doesn't work atm -> idea: only execute arrow*Navigation when not datepicker selected
-
 // TODO bug: year comparison not working when year not entered with 4 digits
+// try momentjs
 
-// TODO lizenzrechte? schule gehört nicht der schule, sondern nur das benutzungsrecht.
+// TODO offenes dropdown feld grösser (länger)
 
-// TODO offenes dropdown feld grösser
+// TODO vor Testauslieferung: lizenzrechte? schule gehört nicht der schule, sondern nur das benutzungsrecht.
 
-// (TODO was tun bei gleichem namen in der gleichen klasse)
+// TODO vor Testauslieferung: viele beschriftete console.logs, um besser helfen zu können
+
+// TODO feature: aus excel datei auch geschlecht auslesen -> musterfoto für männer/frauen unterschiedlich
+
+// TODO erweiterung/anmerkung: was tun bei gleichem namen in der gleichen klasse
 
 // 3 states
 // 1. saved picture available (try von loadExistingImageIfExisting) => aufnehmen + timer, but disabled
 // 2. form not valid (klasse ausgewählt und gebdatum ausgewählt -> formsValid(cb)) => gespeichert mit check icon
 // 3. can actually take picture => aufnehmen + timer (active)
+
+type saveBtnStatus = 'a' | 'b';
 
 @Component({
   selector: 'app-home',
@@ -48,81 +49,88 @@ export class HomeComponent implements OnInit, OnDestroy {
   @ViewChild('webcam', { static: true }) webcamVideo: ElementRef<HTMLVideoElement>;
   @ViewChild('canvas', { static: true }) canvas: ElementRef<HTMLCanvasElement>;
 
-  @HostListener('document:keydown.arrowdown') onArrowDown() {
-    this.arrowDownNavigation();
+  @HostListener('document:keydown.arrowdown', ['$event']) onArrowDown(event: KeyboardEvent) {
+    if (event.target instanceof HTMLBodyElement) {
+      this.arrowDownNavigation();
+    }
   }
 
   private arrowDownNavigation() {
-    const selectedKlasseIndex = this.klassenPool.findIndex(klasse => klasse === this.selectedKlasseForm.value);
+    const selectedKlasseIndex = this.klassenPool.findIndex(klasse => klasse === this.klasseControl.value);
     const nextKlasse = this.klassenPool[ (selectedKlasseIndex + 1) % this.klassenPool.length ];
-    this.selectedKlasseForm.setValue(nextKlasse);
+    this.klasseControl.setValue(nextKlasse);
   }
 
-  @HostListener('document:keydown.arrowup') onArrowUp() {
-    this.arrowUpNavigation();
+  @HostListener('document:keydown.arrowup', ['$event']) onArrowUp(event: KeyboardEvent) {
+    if (event.target instanceof HTMLBodyElement) {
+      this.arrowUpNavigation();
+    }
   }
 
   private arrowUpNavigation() {
-    const selectedKlasseIndex = this.klassenPool.findIndex(klasse => klasse === this.selectedKlasseForm.value);
+    const selectedKlasseIndex = this.klassenPool.findIndex(klasse => klasse === this.klasseControl.value);
     const nextKlasse = this.klassenPool[
       selectedKlasseIndex - 1 === -1 || selectedKlasseIndex === -1
         ? this.klassenPool.length - 1
         : selectedKlasseIndex - 1
       ];
-    this.selectedKlasseForm.setValue(nextKlasse);
+    this.klasseControl.setValue(nextKlasse);
   }
 
-  @HostListener('document:keydown.arrowright') onArrowRight() {
-    this.arrowRightNavigation();
-  }
-
-  private arrowRightNavigation() {
-    if (this.selectedKlasseForm.value) {
-      const selectedSchuelerIndex = this.schuelerPool.findIndex(
-        schueler => schueler.id === this.schuelerForm.get('id').value
-      );
-      const nextSchueler = this.schuelerPool[ (selectedSchuelerIndex + 1) % this.schuelerPool.length ];
-      this.schuelerForm.patchValue(nextSchueler);
-    } else {
-      this.selectedKlasseForm.markAsTouched();
+  @HostListener('document:keydown.arrowright', ['$event']) onArrowRight(event: KeyboardEvent) {
+    if (event.target instanceof HTMLBodyElement) {
+      this.arrowRightNavigation();
     }
   }
 
-  @HostListener('document:keydown.arrowleft') onArrowLeft() {
-    this.arrowLeftNavigation();
+  private arrowRightNavigation() {
+    if (this.klasseControl.value) {
+      const selectedSchuelerIndex = this.schuelerPool.findIndex(
+        schueler => schueler.id === this.schuelerControl.value.id
+      );
+      const nextSchueler = this.schuelerPool[ (selectedSchuelerIndex + 1) % this.schuelerPool.length ];
+      this.schuelerControl.patchValue(nextSchueler);
+    } else {
+      this.klasseControl.markAsTouched();
+    }
+  }
+
+  @HostListener('document:keydown.arrowleft', ['$event']) onArrowLeft(event: KeyboardEvent) {
+    if (event.target instanceof HTMLBodyElement) {
+      this.arrowLeftNavigation();
+    }
   }
 
   private arrowLeftNavigation() {
-    if (this.selectedKlasseForm.value) {
+    if (this.klasseControl.value) {
       const selectedSchuelerIndex = this.schuelerPool.findIndex(
-        schueler => schueler.id === this.schuelerForm.get('id').value
+        schueler => schueler.id === this.schuelerControl.value.id
       );
       const nextSchueler = this.schuelerPool[
         selectedSchuelerIndex - 1 === -1 || selectedSchuelerIndex === -1
           ? this.schuelerPool.length - 1
           : selectedSchuelerIndex - 1
         ];
-      this.schuelerForm.patchValue(nextSchueler);
+      this.schuelerControl.patchValue(nextSchueler);
     } else {
-      this.selectedKlasseForm.markAsTouched();
+      this.klasseControl.markAsTouched();
     }
   }
 
   countdown$: Observable<number>;
+  saveBtnState$: Observable<saveBtnStatus>; // TODO use this to manage save btn state reactively
 
-  selectedKlasseForm: FormControl;
   schuelerForm: FormGroup;
-  gebdatumForm: FormControl;
 
   klassenPool: string[];
   schuelerPool: Schueler[];
 
-  canTakePicture = true;
   canTakePictureDisabled = true;
 
   readonly COUNTDOWN_FROM = 3;
   readonly START_DATEPICKER = new Date(2005, 0, 1);
-  private readonly SQUARESIZE = 500;
+  private readonly SQUARE_CAMERA = 500;
+  private readonly SQUARE_PICTURE = 400;
   private canvasCtx: CanvasRenderingContext2D;
 
   private destroy$$ = new Subject<void>();
@@ -141,31 +149,34 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.canvasCtx = this.canvas.nativeElement.getContext('2d');
 
-    this.selectedKlasseForm = new FormControl('', [Validators.required]);
     this.schuelerForm = new FormGroup({
-      id: new FormControl({ value: '', disabled: true }),
-      vorname: new FormControl({ value: '', disabled: true }),
-      nachname: new FormControl({ value: '', disabled: true }),
-      gebdatum: new FormControl({ value: '', disabled: true })
+      klasse: new FormControl('', [Validators.required]),
+      schueler: new FormControl({value: '', disabled: true}, [Validators.required]),
+      gebdatum: new FormControl({ value: '', disabled: true }, [Validators.required])
     });
-    this.gebdatumForm = new FormControl({ value: '', disabled: true }, [Validators.required]);
 
-    this.selectedKlasseForm.valueChanges
-      .pipe(withLatestFrom(this.readExcelService.klassenWithSchueler$), takeUntil(this.destroy$$))
+    this.klasseControl.valueChanges
+      .pipe(withLatestFrom(this.readExcelService.klassenWithSchueler$), distinctUntilChanged(), takeUntil(this.destroy$$))
       .subscribe(([selectedKlasse, data]) => {
         this.schuelerPool = data.get(selectedKlasse);
-        this.schuelerForm.setValue(this.schuelerPool[ 0 ]);
-        this.gebdatumForm.enable();
-        this.gebdatumForm.reset();
+        this.schuelerControl.enable();
+        this.schuelerControl.setValue(this.schuelerPool[0]);
       });
 
-    this.schuelerForm.valueChanges.pipe(takeUntil(this.destroy$$)).subscribe(schueler => {
-      console.log(schueler); // TODO remove this
-      this.loadImageIfExisting();
-      this.gebdatumForm.reset();
-    });
+    this.schuelerControl.valueChanges.pipe(
+      filter(schueler => !!schueler),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$$)
+    ).subscribe(
+      schueler => {
+        console.log('schueler: ', schueler.gebdatum); // TODO remove this
+        this.loadImageIfExisting();
+        this.gebdatumControl.enable();
+        this.gebdatumControl.reset();
+      }
+    );
 
-    this.gebdatumForm.valueChanges.pipe(distinctUntilChanged(), takeUntil(this.destroy$$)).subscribe(() => {
+    this.gebdatumControl.valueChanges.pipe(distinctUntilChanged(), takeUntil(this.destroy$$)).subscribe(() => {
       this.canTakePictureDisabled = !this.gebdatumEnteredCorrectly();
     });
 
@@ -175,10 +186,10 @@ export class HomeComponent implements OnInit, OnDestroy {
       audio: false,
       video: {
         mandatory: {
-          maxHeight: this.SQUARESIZE,
-          maxWidth: this.SQUARESIZE,
-          minHeight: this.SQUARESIZE,
-          minWidth: this.SQUARESIZE
+          maxHeight: this.SQUARE_CAMERA,
+          maxWidth: this.SQUARE_CAMERA,
+          minHeight: this.SQUARE_CAMERA,
+          minWidth: this.SQUARE_CAMERA
         }
       }
     };
@@ -192,34 +203,55 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private loadImageIfExisting() {
     try {
-      // TODO try to read both? -> depends on if both images are always created or not
-      const base64img = this.saveImageService.readImage(this.selectedKlasseForm.value, this.filenameName);
+      const base64img = this.saveImageService.readImage(this.klasseControl.value, this.filenameName);
       const img = new Image();
       img.onload = () => {
-        this.canvasCtx.drawImage(img, 0, 0, this.SQUARESIZE, this.SQUARESIZE);
+        this.canvasCtx.drawImage(img, 0, 0, this.SQUARE_PICTURE, this.SQUARE_PICTURE);
       };
       img.src = base64img;
-      this.canTakePicture = false;
     } catch (e) {
       this.clearCanvas();
     }
   }
 
   private clearCanvas() {
-    this.canvasCtx.clearRect(0, 0, this.SQUARESIZE, this.SQUARESIZE);
-    this.canTakePicture = true;
+    this.canvasCtx.clearRect(0, 0, this.SQUARE_PICTURE, this.SQUARE_PICTURE);
+  }
+
+  get klasseControl(): AbstractControl {
+    return this.schuelerForm.get('klasse');
+  }
+
+  get schuelerControl(): AbstractControl {
+    return this.schuelerForm.get('schueler');
+  }
+
+  get gebdatumControl(): AbstractControl {
+    return this.schuelerForm.get('gebdatum');
+  }
+
+  schuelerSelected(): boolean {
+    return this.schuelerControl.value;
+  }
+
+  get displayName(): string {
+    const {vorname, nachname} = this.schuelerControl.value;
+    if (this.schuelerSelected()) {
+      return `${vorname} ${nachname}`;
+    } else {
+      return '';
+    }
   }
 
   capture(): void {
     if (this.formsValid()) {
       this.drawImage();
       this.saveImage();
-      this.canTakePicture = false;
     }
   }
 
   timedCapture(): void {
-    if (this.formsValid()) {
+    if (this.formsValid()) { // TODO change this since it's probably not necessary in this way anymore
       this.countdown$ = timer(0, 1000).pipe(
         take(this.COUNTDOWN_FROM + 1),
         map(i => this.COUNTDOWN_FROM - i),
@@ -233,31 +265,30 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   delete(): void {
     this.clearCanvas();
-    this.selectedKlasseForm.markAsUntouched();
+    this.klasseControl.markAsUntouched();
   }
 
   drawImage(): void {
-    this.canvasCtx.drawImage(this.webcamVideo.nativeElement, 0, 0, this.SQUARESIZE, this.SQUARESIZE);
+    this.canvasCtx.drawImage(this.webcamVideo.nativeElement, 0, 0, this.SQUARE_PICTURE, this.SQUARE_PICTURE);
   }
 
   formsValid(): boolean {
-    if (this.selectedKlasseForm.valid) {
+    if (this.klasseControl.valid) {
       if (this.gebdatumEnteredCorrectly()) {
         return true;
       } else {
-        this.gebdatumForm.markAsTouched();
+        this.gebdatumControl.markAsTouched();
         return false;
       }
     } else {
-      this.selectedKlasseForm.markAsTouched();
+      this.klasseControl.markAsTouched();
       return false;
     }
   }
 
   gebdatumEnteredCorrectly(): boolean {
-    // TODO check why this is executed three times!
-    const enteredGebdatum = this.gebdatumForm.value;
-    const correctGebdatum = this.schuelerForm.get('gebdatum').value;
+    const enteredGebdatum = this.gebdatumControl.value;
+    const correctGebdatum = this.schuelerControl.value.gebdatum;
     if (enteredGebdatum && correctGebdatum) {
       return isEqual(enteredGebdatum, correctGebdatum);
     } else {
@@ -266,38 +297,18 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   get filenameName(): string {
-    const { vorname, nachname } = this.schuelerForm.value;
+    const { vorname, nachname } = this.schuelerControl.value;
     return `${nachname}_${vorname}`;
   }
 
   get filenameId(): string {
-    return this.schuelerForm.get('id').value;
+    return this.schuelerControl.value.id;
   }
 
   saveImage(): void {
     const url = this.canvas.nativeElement.toDataURL('image/jpg', 0.8);
-    this.saveImageService.writeImage(url, this.selectedKlasseForm.value, this.filenameName);
-    this.saveImageService.writeImage(url, this.selectedKlasseForm.value, this.filenameId);
-  }
-
-  overwriteUp(e) {
-    e.stopImmediatePropagation();
-    this.arrowUpNavigation();
-  }
-
-  overwriteDown(e) {
-    e.stopImmediatePropagation();
-    this.arrowDownNavigation();
-  }
-
-  overwriteLeft(e) {
-    e.stopImmediatePropagation();
-    this.arrowLeftNavigation();
-  }
-
-  overwriteRight(e) {
-    e.stopImmediatePropagation();
-    this.arrowRightNavigation();
+    this.saveImageService.writeImage(url, this.klasseControl.value, this.filenameName);
+    this.saveImageService.writeImage(url, this.klasseControl.value, this.filenameId);
   }
 
   ngOnDestroy(): void {

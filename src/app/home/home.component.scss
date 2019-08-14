@@ -1,25 +1,28 @@
 @import '../../variables.scss';
 
 :host {
-  margin: 1em;
   display: grid;
-  grid-gap: 1.5em 1em;
-  grid: "logo  foto"
-        "form  foto" /
-        1fr    1fr;
+  margin: 1.5em;
+  grid-gap: 1.5em;
+  grid-template:
+    "form          logo"
+    "schuelercard  foto" /
+    1fr            1fr;
 
   @media(max-width: $breakpoint__tablet) {
-    grid-template: "logo"
-          "form"
-          "foto" /
-          1fr;
+    grid-template:
+      "logo"
+      "form"
+      "foto"
+      "schuelercard" /
+      1fr;
     text-align: center;
   }
 }
 
 .logo {
   grid-area: logo;
-  justify-self: center;
+  place-self: center;
 }
 
 form {
@@ -27,23 +30,18 @@ form {
   align-self: flex-start;
 
   display: grid;
-  grid: "klasse   ."
-        "vorname  nachname"
-        "gebdatum ." /
-        1fr       1fr;
-  grid-gap: 1em;
+  grid-template:
+    "klasse   ."
+    "schueler schueler"
+    "gebdatum ." /
+    1fr       1fr;
 
   & > .klasse {
     grid-area: klasse;
-    margin-bottom: 1em;
   }
 
-  & > .vorname {
-    grid-area: vorname;
-  }
-
-  & > .nachname {
-    grid-area: nachname;
+  & > .schueler {
+    grid-area: schueler;
   }
 
   & > .gebdatum {
@@ -51,46 +49,59 @@ form {
   }
 
   @media(max-width: $breakpoint__mobile) {
-    grid-template: "klasse"
-          "vorname"
-          "nachname"
-          "gebdatum" /
-          1fr;
+    grid-template:
+      "klasse"
+      "schueler"
+      "gebdatum" /
+      1fr;
+  }
+}
+
+mat-card {
+  grid-area: schuelercard;
+  max-width: 400px;
+  place-self: center;
+
+  & > figure {
+    display: grid;
+    grid-template:
+      "pic" /
+      1fr;
+
+    & > * {
+      grid-area: pic;
+      width: 100%;
+    }
   }
 }
 
 .foto {
   grid-area: foto;
-  place-self: center;
+  align-self: start;
+  justify-self: center;
   margin: 0;
+  width: 500px;
 
   display: grid;
   grid-gap: 1em;
-  grid: "caption     caption"
-        "picture     picture" 500px
-        "capture-btn delete-btn" /
-        1fr          1fr;
+  grid-template:
+    "picture     picture" 500px
+    "capture-btn timer-btn" /
+    1fr          1fr;
 
-  & > .musterbild {
+  & > .video-placeholder {
     grid-area: picture;
     width: 100%;
+    height: 100%;
     place-self: center;
+    color: var(--color__main);
     margin: 0;
+    border: 1px dashed var(--color__main);
 
     display: grid;
     grid-template: "area" /
-          1fr;
+      1fr;
     place-items: center;
-
-    & > figcaption {
-      grid-area: area;
-      align-self: flex-end;
-    }
-
-    & > img {
-      grid-area: area;
-      width: 100%;
-    }
   }
 
   & > canvas {
@@ -101,28 +112,24 @@ form {
     grid-area: picture;
   }
 
-  & > figcaption {
-    grid-area: caption;
-  }
-
-  & > .capture-grp {
+  & > .capture-btn {
     grid-area: capture-btn;
   }
 
-  & > .delete-btn {
-    grid-area: delete-btn;
+  & > .timer-btn {
+    grid-area: timer-btn;
   }
 }
 
-.capture-grp {
-  display: flex;
-  align-items: center;
-
-  & > .capture-btn {
-    flex-grow: 1;
-  }
-}
-
-.timer-btn {
-  font-size: 1.2rem;
-}
+//.capture-grp {
+//  display: flex;
+//  align-items: center;
+//
+//  & > .capture-btn {
+//    flex-grow: 1;
+//  }
+//}
+//
+//.timer-btn {
+//  font-size: 1.2rem;
+//}

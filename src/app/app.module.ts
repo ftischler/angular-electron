@@ -13,10 +13,12 @@ import {
   MAT_DATE_FORMATS,
   MAT_DATE_LOCALE,
   MatButtonModule,
+  MatCardModule,
   MatDatepickerModule,
   MatInputModule,
   MatNativeDateModule,
-  MatSelectModule, MatSnackBarModule
+  MatSelectModule,
+  MatSnackBarModule
 } from '@angular/material';
 import { RxNgZoneSchedulerModule } from 'ngx-rxjs-zone-scheduler';
 import { DateFnsDateAdapter } from './util/date-fns-date-adapter.service';
@@ -44,6 +46,7 @@ export const MAT_DATE_FNS_DATE_FORMATS = {
     MatSelectModule,
     MatInputModule,
     MatButtonModule,
+    MatCardModule,
     MatDatepickerModule,
     MatNativeDateModule,
     MatSnackBarModule,
