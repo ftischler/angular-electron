@@ -89,7 +89,7 @@
     <span *ngIf="klasseControl.hasError('required') && submitted">
       Bitte wählen Sie zuerst eine Klasse aus.
     </span>
-    <span *ngIf="gebdatumControl.hasError('required') && submitted">
+    <span *ngIf="!klasseControl.hasError('required') && gebdatumControl.hasError('required') && submitted">
       Bitte geben Sie Ihr Geburtsdatum an, um das Foto aufnehmen zu können.
     </span>
     <span *ngIf="gebdatumControl.hasError('gebdatumUnequal') && submitted">

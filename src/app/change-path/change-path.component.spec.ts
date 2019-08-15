@@ -1,6 +1,10 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { ChangePathComponent } from './change-path.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { RouterTestingModule } from '@angular/router/testing';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('ChangePathComponent', () => {
   let component: ChangePathComponent;
@@ -8,7 +12,14 @@ describe('ChangePathComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ChangePathComponent]
+      declarations: [ChangePathComponent],
+      imports: [
+        ReactiveFormsModule,
+        BrowserAnimationsModule,
+        MatInputModule,
+        MatSnackBarModule,
+        RouterTestingModule
+      ]
     }).compileComponents();
   }));
 

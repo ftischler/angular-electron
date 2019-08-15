@@ -6,6 +6,8 @@ let win, serve;
 const args = process.argv.slice(1);
 serve = args.some(val => val === '--serve');
 
+// TODO change window width & height
+
 function createWindow() {
 
   const electronScreen = screen;
@@ -70,11 +72,11 @@ try {
         label: 'Ansicht',
         submenu:[
           {role: 'reload'},
-          {role: 'forcereload'},
+          {role: 'forceReload'},
           {type: 'separator'},
-          {role: 'zoomin'},
-          {role: 'zoomout'},
-          {role: 'resetzoom'},
+          {role: 'zoomIn'},
+          {role: 'zoomOut'},
+          {role: 'resetZoom'},
           {type: 'separator'},
           {role: 'togglefullscreen'}
         ]

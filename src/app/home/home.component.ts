@@ -13,13 +13,10 @@ import { Observable, Subject, timer } from 'rxjs';
 import { distinctUntilChanged, filter, finalize, map, take, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Schueler } from '../schueler.model';
-import { InitializeStorageService } from '../initialize-storage/initialize-storage.service';
 import * as moment from 'moment';
 import { MatSelect } from '@angular/material/select';
 
 // TODO test this shit
-
-// TODO vor Testauslieferung: lizenzrechte? schule gehört nicht der schule, sondern nur das benutzungsrecht.
 
 // TODO frage an amann: lieber duzen statt siezen? viele studien zeigen, emotionale ebene ansprechen, sogar bei versicherungen allianz eingesetzt
 
