@@ -11,27 +11,39 @@ import { ReadWriteImageService } from '../read-write-image/read-write-image.serv
 import { ReadExcelService } from '../read-excel/read-excel.service';
 import { Observable, Subject, timer } from 'rxjs';
 import { distinctUntilChanged, filter, finalize, map, take, takeUntil, withLatestFrom } from 'rxjs/operators';
-import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Schueler } from '../schueler.model';
 import { InitializeStorageService } from '../initialize-storage/initialize-storage.service';
 import * as moment from 'moment';
+import { MatSelect } from '@angular/material/select';
 
 // TODO test this shit
 
-// TODO add info msg below buttons, to tell user what to do next!
-
 // TODO vor Testauslieferung: lizenzrechte? schule gehört nicht der schule, sondern nur das benutzungsrecht.
 
-// TODO feature: aus excel datei auch geschlecht auslesen -> musterfoto für männer/frauen unterschiedlich
+// TODO frage an amann: lieber duzen statt siezen? viele studien zeigen, emotionale ebene ansprechen, sogar bei versicherungen allianz eingesetzt
+
+// TODO frage an amann: idee: button in mat-card 'akzeptieren/abschliessen/...' -> wählt nächsten schüler aus (und löscht gebdatum). [wording zB passbild akzeptieren]
+// evtl sogar zusätzlich: Hinweismeldung, wenn Klasse durch ist und alle Schüler ein Bild abgespeichert haben!
 
 // TODO erweiterung/anmerkung: was tun bei gleichem namen in der gleichen klasse
 
-// 3 states
-// 1. saved picture available (try von loadExistingImageIfExisting) => aufnehmen + timer, but disabled
-// 2. form not valid (klasse ausgewählt und gebdatum ausgewählt -> formsValid(cb)) => gespeichert mit check icon
-// 3. can actually take picture => aufnehmen + timer (active)
-
 // type saveBtnStatus = 'a' | 'b';
+
+function gebdatumValidator(): ValidatorFn {
+  return (group: FormGroup): ValidationErrors => {
+    const enteredValue = group.controls['gebdatum'].value;
+    const correctValue = group.controls['schueler'].value.gebdatum;
+    if (!enteredValue) {
+      group.controls['gebdatum'].setErrors({ required: true });
+    } else if (!moment(enteredValue).isSame(correctValue)) {
+      group.controls['gebdatum'].setErrors({ gebdatumUnequal: true });
+    } else {
+      group.controls['gebdatum'].setErrors(null);
+    }
+    return;
+  };
+}
 
 @Component({
   selector: 'app-home',
@@ -44,7 +56,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   @ViewChild('canvas', { static: true }) canvas: ElementRef<HTMLCanvasElement>;
 
   @HostListener('document:keydown.arrowdown', ['$event']) onArrowDown(event: KeyboardEvent) {
-    if (event.target instanceof HTMLBodyElement) { // TODO maybe swap this with everything except dropdowns or select
+    if (!(event.target instanceof MatSelect)) {
       this.arrowDownNavigation();
     }
   }
@@ -57,7 +69,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   @HostListener('document:keydown.arrowup', ['$event']) onArrowUp(event: KeyboardEvent) {
-    if (event.target instanceof HTMLBodyElement) {
+    if (!(event.target instanceof MatSelect)) {
       this.arrowUpNavigation();
     }
   }
@@ -70,7 +82,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   @HostListener('document:keydown.arrowright', ['$event']) onArrowRight(event: KeyboardEvent) {
-    if (event.target instanceof HTMLBodyElement) {
+    if (!(event.target instanceof MatSelect)) {
       this.arrowRightNavigation();
     }
   }
@@ -80,7 +92,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       const selectedSchuelerIndex = this.schuelerPool.findIndex(
         schueler => schueler.id === this.schuelerControl.value.id
       );
-      if (selectedSchuelerIndex +1 < this.schuelerPool.length) {
+      if (selectedSchuelerIndex + 1 < this.schuelerPool.length) {
         this.schuelerControl.patchValue(this.schuelerPool[selectedSchuelerIndex + 1]);
       }
     } else {
@@ -89,7 +101,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   @HostListener('document:keydown.arrowleft', ['$event']) onArrowLeft(event: KeyboardEvent) {
-    if (event.target instanceof HTMLBodyElement) {
+    if (!(event.target instanceof MatSelect)) {
       this.arrowLeftNavigation();
     }
   }
@@ -100,7 +112,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         schueler => schueler.id === this.schuelerControl.value.id
       );
       if (selectedSchuelerIndex - 1 >= 0) {
-        this.schuelerControl.patchValue(this.schuelerPool[ selectedSchuelerIndex - 1 ]);
+        this.schuelerControl.patchValue(this.schuelerPool[selectedSchuelerIndex - 1]);
       }
     } else {
       this.klasseControl.markAsTouched();
@@ -115,8 +127,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   klassenPool: string[];
   schuelerPool: Schueler[];
 
+  submitted = false;
   pictureTaken = false;
-  canTakePictureDisabled = true;
+  pictureLoaded = false;
 
   readonly COUNTDOWN_FROM = 3;
   readonly START_DATEPICKER = new Date(2005, 0, 1);
@@ -126,24 +139,21 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private destroy$$ = new Subject<void>();
 
-  constructor(
-    private initializeStorageService: InitializeStorageService,
-    private readExcelService: ReadExcelService,
-    private saveImageService: ReadWriteImageService
-  ) {}
+  constructor(private readExcelService: ReadExcelService, private saveImageService: ReadWriteImageService) {}
 
   ngOnInit() {
-    this.initializeStorageService.initializeAll();
-
-    this.readExcelService.parseExcel();
-
     this.canvasCtx = this.canvas.nativeElement.getContext('2d');
 
-    this.schuelerForm = new FormGroup({
-      klasse: new FormControl('', [Validators.required]),
-      schueler: new FormControl({ value: '', disabled: true }, [Validators.required]),
-      gebdatum: new FormControl({ value: '', disabled: true }, [Validators.required])
-    });
+    this.schuelerForm = new FormGroup(
+      {
+        klasse: new FormControl('', [Validators.required]),
+        schueler: new FormControl({ value: '', disabled: true }, [Validators.required]),
+        gebdatum: new FormControl({ value: '', disabled: true })
+      },
+      gebdatumValidator()
+    );
+
+    this.readExcelService.klassen$.subscribe(klassen => (this.klassenPool = klassen));
 
     this.klasseControl.valueChanges
       .pipe(
@@ -169,17 +179,6 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.gebdatumControl.enable();
         this.gebdatumControl.reset();
       });
-
-    this.gebdatumControl.valueChanges
-      .pipe(
-        distinctUntilChanged(), // TODO idea: use map instead of logic in subscribe and turn into observable, also combinelatest with schueler valuechanges
-        takeUntil(this.destroy$$)
-      )
-      .subscribe(() => {
-        this.canTakePictureDisabled = !this.gebdatumEnteredCorrectly();
-      });
-
-    this.readExcelService.klassen$.subscribe(klassen => (this.klassenPool = klassen));
 
     const webcamConfig = {
       audio: false,
@@ -208,7 +207,8 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.canvasCtx.drawImage(img, 0, 0, this.SQUARE_PICTURE, this.SQUARE_PICTURE);
       };
       img.src = base64img;
-      this.pictureTaken = true;
+      this.pictureTaken = false;
+      this.pictureLoaded = true;
     } catch (e) {
       this.clearCanvas();
     }
@@ -216,6 +216,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private clearCanvas() {
     this.canvasCtx.clearRect(0, 0, this.SQUARE_PICTURE, this.SQUARE_PICTURE);
+    this.pictureLoaded = false;
     this.pictureTaken = false;
   }
 
@@ -240,21 +241,23 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (this.schuelerSelected()) {
       return `${nachname}, ${vorname}`;
     } else {
-      return '';
+      return 'Musterfoto';
     }
   }
 
   capture(): void {
+    this.submitted = true;
     if (this.formsValid()) {
       this.drawImage();
       this.saveImage();
       this.pictureTaken = true;
+      this.pictureLoaded = false;
     }
   }
 
   timedCapture(): void {
+    this.submitted = true;
     if (this.formsValid()) {
-      // TODO change this since it's probably not necessary in this way anymore
       this.countdown$ = timer(0, 1000).pipe(
         take(this.COUNTDOWN_FROM + 1),
         map(i => this.COUNTDOWN_FROM - i),
@@ -271,8 +274,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   formsValid(): boolean {
+    // TODO refactor this away, use mat input injectiontoken etc.
     if (this.klasseControl.valid) {
-      if (this.gebdatumEnteredCorrectly()) {
+      if (this.gebdatumControl.valid) {
         return true;
       } else {
         this.gebdatumControl.markAsTouched();
@@ -284,15 +288,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
-  gebdatumEnteredCorrectly(): boolean {
-    const enteredGebdatum = this.gebdatumControl.value;
-    const correctGebdatum = this.schuelerControl.value.gebdatum;
-    if (enteredGebdatum) {
-      console.log('eingegebenes Geburtsdatum: ', enteredGebdatum);
-    }
-    return enteredGebdatum && correctGebdatum ? moment(enteredGebdatum).isSame(correctGebdatum) : false;
-  }
-
   get filenameName(): string {
     const { vorname, nachname } = this.schuelerControl.value;
     return `${nachname}_${vorname}`;
@@ -300,6 +295,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   get filenameId(): string {
     return this.schuelerControl.value.id;
+  }
+
+  isFemaleSelected(): boolean {
+    return this.schuelerControl.value.geschlecht === 'W';
   }
 
   saveImage(): void {

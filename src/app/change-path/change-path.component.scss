@@ -5,9 +5,9 @@ form {
     'picturePath    picturePath'
     'excelPath      excelPath'
     'subtitle       subtitle'
-    'idSpalte       .'
-    'nachnameSpalte  vornameSpalte'
-    'gebdatumSpalte klasseSpalte'
+    'idSpalte       klasseSpalte'
+    'nachnameSpalte vornameSpalte'
+    'gebdatumSpalte geschlechtSpalte'
     'backButton     saveButton' /
     1fr             1fr;
   grid-gap: 1em;
@@ -21,11 +21,11 @@ form {
       'picturePath'
       'excelPath'
       'subtitle'
+      'klasseSpalte'
       'idSpalte'
       'nachnameSpalte'
       'vornameSpalte'
       'gebdatumSpalte'
-      'klasseSpalte'
       'backButton'
       'saveButton' /
       1fr;
@@ -78,6 +78,10 @@ h2 {
 
 .klasseSpalte {
   grid-area: klasseSpalte;
+}
+
+.geschlechtSpalte {
+  grid-area: geschlechtSpalte;
 }
 
 .back {

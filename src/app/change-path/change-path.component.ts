@@ -4,6 +4,7 @@ import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/fo
 import {
   EXCEL_PATH_KEY,
   GEBDATUM_SPALTE_KEY,
+  GESCHLECHT_SPALTE_KEY,
   ID_SPALTE_KEY,
   KLASSE_SPALTE_KEY,
   NACHNAME_SPALTE_KEY,
@@ -11,6 +12,7 @@ import {
   VORNAME_SPALTE_KEY
 } from '../localstorage-keys';
 import { AppConfig } from '../../environments/environment';
+import { ReadExcelService } from '../read-excel/read-excel.service';
 
 @Component({
   selector: 'app-change-path',
@@ -44,10 +46,14 @@ export class ChangePathComponent {
     klasseSpalte: new FormControl(JSON.parse(window.localStorage.getItem(KLASSE_SPALTE_KEY)), [
       Validators.required,
       Validators.pattern('[A-Z]{1,3}')
+    ]),
+    geschlechtSpalte: new FormControl(JSON.parse(window.localStorage.getItem(GESCHLECHT_SPALTE_KEY)), [
+      Validators.required,
+      Validators.pattern('[A-Z]{1,3}')
     ])
   });
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private readExcelService: ReadExcelService) {
     this.version = AppConfig.version;
   }
 
@@ -60,9 +66,11 @@ export class ChangePathComponent {
       VORNAME_SPALTE_KEY,
       NACHNAME_SPALTE_KEY,
       GEBDATUM_SPALTE_KEY,
-      KLASSE_SPALTE_KEY
+      KLASSE_SPALTE_KEY,
+      GESCHLECHT_SPALTE_KEY
     ].forEach(key => this.saveToLocalStorage(key));
     this.form.markAsPristine();
+    this.readExcelService.parseExcel();
   }
 
   back() {
@@ -100,5 +108,9 @@ export class ChangePathComponent {
 
   get klasseControl(): AbstractControl {
     return this.form.get(KLASSE_SPALTE_KEY);
+  }
+
+  get geschlechtControl(): AbstractControl {
+    return this.form.get(GESCHLECHT_SPALTE_KEY);
   }
 }

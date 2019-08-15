@@ -60,7 +60,9 @@ form {
 mat-card {
   grid-area: schuelercard;
   max-width: 400px;
-  place-self: center;
+  justify-self: center;
+  align-self: start;
+  margin-top: 1em;
 
   & > figure {
     display: grid;
@@ -86,7 +88,8 @@ mat-card {
   grid-gap: 1em;
   grid-template:
     "picture     picture" 500px
-    "capture-btn timer-btn" /
+    "capture-btn timer-btn"
+    "btn-hint btn-hint" /
     1fr          1fr;
 
   & > .video-placeholder {
@@ -118,5 +121,11 @@ mat-card {
 
   & > .timer-btn {
     grid-area: timer-btn;
+  }
+
+  & > .btn-hint {
+    grid-area: btn-hint;
+    margin-top: -1em;
+    font-size: 75%;
   }
 }

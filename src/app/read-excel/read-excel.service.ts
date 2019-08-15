@@ -7,12 +7,14 @@ import { map } from 'rxjs/operators';
 import {
   EXCEL_PATH_KEY,
   GEBDATUM_SPALTE_KEY,
+  GESCHLECHT_SPALTE_KEY,
   ID_SPALTE_KEY,
   KLASSE_SPALTE_KEY,
   NACHNAME_SPALTE_KEY,
   VORNAME_SPALTE_KEY
 } from '../localstorage-keys';
 import { MatSnackBar } from '@angular/material';
+import { InitializeStorageService } from '../initialize-storage/initialize-storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +24,11 @@ export class ReadExcelService {
 
   private data: ReplaySubject<Map<string, Schueler[]>> = new ReplaySubject();
 
-  constructor(private snackBar: MatSnackBar) {}
+  constructor(private snackBar: MatSnackBar, private initializeStorageService: InitializeStorageService) {
+    this.initializeStorageService.initializeAll();
+
+    this.parseExcel();
+  }
 
   colLetter(key: string): string {
     return JSON.parse(window.localStorage.getItem(key));
@@ -57,28 +63,31 @@ export class ReadExcelService {
         .filter((_, index) => index !== 0)
         .map(schueler => ({
           id: schueler[this.colLetter(ID_SPALTE_KEY)],
-          vorname: schueler[this.colLetter(VORNAME_SPALTE_KEY)],
+          klasse: schueler[this.colLetter(KLASSE_SPALTE_KEY)],
           nachname: schueler[this.colLetter(NACHNAME_SPALTE_KEY)],
+          vorname: schueler[this.colLetter(VORNAME_SPALTE_KEY)],
           gebdatum: schueler[this.colLetter(GEBDATUM_SPALTE_KEY)]
             ? new Date(schueler[this.colLetter(GEBDATUM_SPALTE_KEY)])
             : new Date(2000, 0, 1),
-          klasse: schueler[this.colLetter(KLASSE_SPALTE_KEY)]
+          geschlecht: schueler[this.colLetter(GESCHLECHT_SPALTE_KEY)]
         }))
         .reduce((map, schueler) => {
           if (map.has(schueler.klasse)) {
             map.get(schueler.klasse).push({
               id: schueler.id,
-              vorname: schueler.vorname,
               nachname: schueler.nachname,
-              gebdatum: schueler.gebdatum
+              vorname: schueler.vorname,
+              gebdatum: schueler.gebdatum,
+              geschlecht: schueler.geschlecht
             });
           } else {
             map.set(schueler.klasse, [
               {
                 id: schueler.id,
-                vorname: schueler.vorname,
                 nachname: schueler.nachname,
-                gebdatum: schueler.gebdatum
+                vorname: schueler.vorname,
+                gebdatum: schueler.gebdatum,
+                geschlecht: schueler.geschlecht
               }
             ]);
           }

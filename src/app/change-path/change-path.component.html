@@ -71,6 +71,16 @@
     </mat-error>
   </mat-form-field>
 
+  <mat-form-field class="geschlechtSpalte">
+    <input matInput formControlName="geschlechtSpalte" placeholder="Geschlecht" type="text">
+    <mat-error *ngIf="geschlechtControl.hasError('pattern') && !geschlechtControl.hasError('required')">
+      Bitte geben Sie eine gültige Excel-Spaltennummer ein, z.B. A, D, AF, usw.
+    </mat-error>
+    <mat-error *ngIf="geschlechtControl.hasError('required')">
+      Bitte geben Sie eine Excel-Spaltennummer ein.
+    </mat-error>
+  </mat-form-field>
+
   <button class="btn--icon back" type="button" (click)="back()">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
     Zurück zur Anwendung

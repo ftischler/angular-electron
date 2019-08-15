@@ -5,3 +5,4 @@ export const VORNAME_SPALTE_KEY = 'vornameSpalte';
 export const NACHNAME_SPALTE_KEY = 'nachnameSpalte';
 export const GEBDATUM_SPALTE_KEY = 'gebdatumSpalte';
 export const KLASSE_SPALTE_KEY = 'klasseSpalte';
+export const GESCHLECHT_SPALTE_KEY = 'geschlechtSpalte';

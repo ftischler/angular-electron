@@ -3,4 +3,5 @@ export interface Schueler {
   vorname: string;
   nachname: string;
   gebdatum: Date;
+  geschlecht: 'M' | 'W';
 }

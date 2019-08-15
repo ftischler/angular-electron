@@ -59,5 +59,4 @@ export const MY_FORMATS = {
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule {
-}
+export class AppModule {}
