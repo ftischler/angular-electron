@@ -1,4 +1,4 @@
-import { app, BrowserWindow, screen, Menu, globalShortcut } from 'electron';
+import { app, BrowserWindow, Menu, globalShortcut } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 
@@ -10,15 +10,11 @@ serve = args.some(val => val === '--serve');
 
 function createWindow() {
 
-  const electronScreen = screen;
-  const size = electronScreen.getPrimaryDisplay().workAreaSize;
-
   // Create the browser window.
   win = new BrowserWindow({
-    x: 0,
-    y: 0,
-    width: size.width,
-    height: size.height,
+    width: 1100,
+    height: 950,
+    center: true,
     webPreferences: {
       nodeIntegration: true,
     },
@@ -62,7 +58,7 @@ try {
     const menu = Menu.buildFromTemplate([
       {
         label: 'Anwendung',
-        submenu:[
+        submenu: [
           {role: 'close'},
           {type: 'separator'},
           {role: 'quit'}
@@ -70,7 +66,7 @@ try {
       },
       {
         label: 'Ansicht',
-        submenu:[
+        submenu: [
           {role: 'reload'},
           {role: 'forceReload'},
           {type: 'separator'},
@@ -83,7 +79,7 @@ try {
       },
       {
         label: 'Edit',
-        submenu:[
+        submenu: [
           {role: 'undo'},
           {role: 'redo'},
           {type: 'separator'},
@@ -95,13 +91,13 @@ try {
       },
       {
         label: 'Fenster',
-        submenu:[
+        submenu: [
           {role: 'minimize'}
         ]
       },
       {
         label: 'Einstellungen',
-        submenu:[
+        submenu: [
           {label: 'Laufwerkpfade einstellen',
             click() {
               win.webContents.send('change-paths');
@@ -114,7 +110,7 @@ try {
 
     globalShortcut.register('CommandOrControl+Alt+i', () => {
       win.webContents.openDevTools();
-    })
+    });
   });
 
   // Quit when all windows are closed.

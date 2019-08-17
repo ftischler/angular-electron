@@ -49,8 +49,60 @@ function gebdatumValidator(): ValidatorFn {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HomeComponent implements OnInit, OnDestroy {
+
+  constructor(private readExcelService: ReadExcelService, private saveImageService: ReadWriteImageService) {}
+
+  get klasseControl(): AbstractControl {
+    return this.schuelerForm.get('klasse');
+  }
+
+  get schuelerControl(): AbstractControl {
+    return this.schuelerForm.get('schueler');
+  }
+
+  get gebdatumControl(): AbstractControl {
+    return this.schuelerForm.get('gebdatum');
+  }
+
+  get displayName(): string {
+    const { vorname, nachname } = this.schuelerControl.value;
+    if (this.schuelerSelected()) {
+      return `${nachname}, ${vorname}`;
+    } else {
+      return 'Musterfoto';
+    }
+  }
+
+  get filenameName(): string {
+    const { vorname, nachname } = this.schuelerControl.value;
+    return `${nachname}_${vorname}`;
+  }
+
+  get filenameId(): string {
+    return this.schuelerControl.value.id;
+  }
   @ViewChild('webcam', { static: true }) webcamVideo: ElementRef<HTMLVideoElement>;
   @ViewChild('canvas', { static: true }) canvas: ElementRef<HTMLCanvasElement>;
+
+  countdown$: Observable<number>;
+  // saveBtnState$: Observable<saveBtnStatus>; // TODO use this to manage save btn state reactively
+
+  schuelerForm: FormGroup;
+
+  klassenPool: string[];
+  schuelerPool: Schueler[];
+
+  submitted = false;
+  pictureTaken = false;
+  pictureLoaded = false;
+
+  readonly COUNTDOWN_FROM = 3;
+  readonly START_DATEPICKER = new Date(2005, 0, 1);
+  private readonly SQUARE_CAMERA = 500;
+  readonly SQUARE_PICTURE = 400;
+  private canvasCtx: CanvasRenderingContext2D;
+
+  private destroy$$ = new Subject<void>();
 
   @HostListener('document:keydown.arrowdown', ['$event']) onArrowDown(event: KeyboardEvent) {
     if (!(event.target instanceof MatSelect)) {
@@ -116,28 +168,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
-  countdown$: Observable<number>;
-  // saveBtnState$: Observable<saveBtnStatus>; // TODO use this to manage save btn state reactively
-
-  schuelerForm: FormGroup;
-
-  klassenPool: string[];
-  schuelerPool: Schueler[];
-
-  submitted = false;
-  pictureTaken = false;
-  pictureLoaded = false;
-
-  readonly COUNTDOWN_FROM = 3;
-  readonly START_DATEPICKER = new Date(2005, 0, 1);
-  private readonly SQUARE_CAMERA = 500;
-  readonly SQUARE_PICTURE = 400;
-  private canvasCtx: CanvasRenderingContext2D;
-
-  private destroy$$ = new Subject<void>();
-
-  constructor(private readExcelService: ReadExcelService, private saveImageService: ReadWriteImageService) {}
-
   ngOnInit() {
     this.canvasCtx = this.canvas.nativeElement.getContext('2d');
 
@@ -190,9 +220,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     };
 
     navigator.getUserMedia(
-      webcamConfig as any,
+      webcamConfig as MediaStreamConstraints,
       stream => (this.webcamVideo.nativeElement.srcObject = stream),
-      error => console.error(error)
+      error => console.error('webcam stream ran into error: ', error)
     );
   }
 
@@ -217,29 +247,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.pictureTaken = false;
   }
 
-  get klasseControl(): AbstractControl {
-    return this.schuelerForm.get('klasse');
-  }
-
-  get schuelerControl(): AbstractControl {
-    return this.schuelerForm.get('schueler');
-  }
-
-  get gebdatumControl(): AbstractControl {
-    return this.schuelerForm.get('gebdatum');
-  }
-
   schuelerSelected(): boolean {
     return this.schuelerControl.value;
-  }
-
-  get displayName(): string {
-    const { vorname, nachname } = this.schuelerControl.value;
-    if (this.schuelerSelected()) {
-      return `${nachname}, ${vorname}`;
-    } else {
-      return 'Musterfoto';
-    }
   }
 
   capture(): void {
@@ -283,15 +292,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.klasseControl.markAsTouched();
       return false;
     }
-  }
-
-  get filenameName(): string {
-    const { vorname, nachname } = this.schuelerControl.value;
-    return `${nachname}_${vorname}`;
-  }
-
-  get filenameId(): string {
-    return this.schuelerControl.value.id;
   }
 
   isFemaleSelected(): boolean {

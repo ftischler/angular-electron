@@ -4,7 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('ChangePathComponent', () => {
   let component: ChangePathComponent;
@@ -13,13 +13,7 @@ describe('ChangePathComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ChangePathComponent],
-      imports: [
-        ReactiveFormsModule,
-        BrowserAnimationsModule,
-        MatInputModule,
-        MatSnackBarModule,
-        RouterTestingModule
-      ]
+      imports: [ReactiveFormsModule, NoopAnimationsModule, MatInputModule, MatSnackBarModule, RouterTestingModule]
     }).compileComponents();
   }));
 

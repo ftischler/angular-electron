@@ -20,15 +20,18 @@ import { InitializeStorageService } from '../initialize-storage/initialize-stora
   providedIn: 'root'
 })
 export class ReadExcelService {
-  private readonly DATEFORMAT = 'YYYY/MM/DD';
-
-  private data: ReplaySubject<Map<string, Schueler[]>> = new ReplaySubject();
 
   constructor(private snackBar: MatSnackBar, private initializeStorageService: InitializeStorageService) {
     this.initializeStorageService.initializeAll();
 
     this.parseExcel();
   }
+  private readonly DATEFORMAT = 'YYYY/MM/DD';
+
+  private data: ReplaySubject<Map<string, Schueler[]>> = new ReplaySubject();
+
+  klassen$: Observable<string[]> = this.data.pipe(map(x => Array.from(x.keys())));
+  klassenWithSchueler$: Observable<Map<string, Schueler[]>> = this.data;
 
   colLetter(key: string): string {
     return JSON.parse(window.localStorage.getItem(key));
@@ -41,9 +44,6 @@ export class ReadExcelService {
     return { min: sortedCols[0], max: sortedCols[sortedCols.length - 1] };
   }
 
-  klassen$: Observable<string[]> = this.data.pipe(map(x => Array.from(x.keys())));
-  klassenWithSchueler$: Observable<Map<string, Schueler[]>> = this.data;
-
   parseExcel(): void {
     try {
       const wb: WorkBook = readFile(join(JSON.parse(window.localStorage.getItem(EXCEL_PATH_KEY))), {
@@ -53,7 +53,7 @@ export class ReadExcelService {
       const ws: WorkSheet = wb.Sheets[wb.SheetNames[0]];
 
       // limit range to the needed columns for performance reasons
-      let range = utils.decode_range(ws['!ref']);
+      const range = utils.decode_range(ws['!ref']);
       range.s.c = utils.decode_col(this.minmaxCols().min);
       range.e.c = utils.decode_col(this.minmaxCols().max);
       const new_range = utils.encode_range(range);
@@ -71,9 +71,9 @@ export class ReadExcelService {
             : new Date(2000, 0, 1),
           geschlecht: schueler[this.colLetter(GESCHLECHT_SPALTE_KEY)]
         }))
-        .reduce((map, schueler) => {
-          if (map.has(schueler.klasse)) {
-            map.get(schueler.klasse).push({
+        .reduce((newMap, schueler) => {
+          if (newMap.has(schueler.klasse)) {
+            newMap.get(schueler.klasse).push({
               id: schueler.id,
               nachname: schueler.nachname,
               vorname: schueler.vorname,
@@ -81,7 +81,7 @@ export class ReadExcelService {
               geschlecht: schueler.geschlecht
             });
           } else {
-            map.set(schueler.klasse, [
+            newMap.set(schueler.klasse, [
               {
                 id: schueler.id,
                 nachname: schueler.nachname,
@@ -91,7 +91,7 @@ export class ReadExcelService {
               }
             ]);
           }
-          return map;
+          return newMap;
         }, new Map<string, Schueler[]>());
 
       console.log('data from excel: ', data);

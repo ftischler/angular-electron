@@ -10,15 +10,8 @@ import { RxNgZoneSchedulerModule } from 'ngx-rxjs-zone-scheduler';
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    BrowserAnimationsModule,
-    MatSnackBarModule,
-    RxNgZoneSchedulerModule
-  ],
+  imports: [BrowserModule, AppRoutingModule, BrowserAnimationsModule, MatSnackBarModule, RxNgZoneSchedulerModule],
   providers: [{ provide: LOCALE_ID, useValue: 'de-DE' }],
   bootstrap: [AppComponent]
 })
-export class AppModule {
-}
+export class AppModule {}

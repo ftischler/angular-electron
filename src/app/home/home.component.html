@@ -27,7 +27,7 @@
     <input matInput formControlName="gebdatum" [matDatepicker]="myDatepicker" placeholder="Geburtsdatum">
     <mat-datepicker-toggle matSuffix [for]="myDatepicker"></mat-datepicker-toggle>
     <mat-datepicker #myDatepicker startView="multi-year" [startAt]="START_DATEPICKER"></mat-datepicker>
-    <mat-hint>
+    <mat-hint *ngIf="gebdatumControl.enabled">
       <span *ngIf="schuelerForm.invalid">
         Bitte geben Sie Ihr Geburtsdatum an, um das Foto aufnehmen zu können.
       </span>

@@ -36,9 +36,6 @@ export const MY_FORMATS = {
     MatMomentDateModule,
     RouterModule.forChild([{ path: '', component: HomeComponent }])
   ],
-  providers: [
-    { provide: MAT_DATE_LOCALE, useValue: 'de-DE' },
-    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS }
-  ]
+  providers: [{ provide: MAT_DATE_LOCALE, useValue: 'de-DE' }, { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS }]
 })
 export class HomeModule {}
