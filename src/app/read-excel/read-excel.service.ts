@@ -20,7 +20,6 @@ import { InitializeStorageService } from '../initialize-storage/initialize-stora
   providedIn: 'root'
 })
 export class ReadExcelService {
-
   constructor(private snackBar: MatSnackBar, private initializeStorageService: InitializeStorageService) {
     this.initializeStorageService.initializeAll();
 

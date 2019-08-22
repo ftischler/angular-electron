@@ -9,7 +9,7 @@
       "projectType": "application",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "ngx-build-plus:browser",
           "options": {
             "outputPath": "dist",
             "index": "src/index.html",
@@ -28,7 +28,9 @@
               "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "extraWebpackConfig": "node_modules/@typebytes/ngx-template-streams/webpack/webpack.config.js",
+            "plugin": "~node_modules/@typebytes/ngx-template-streams/internal/plugin.js"
           },
           "configurations": {
             "dev": {
@@ -68,9 +70,11 @@
           }
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "ngx-build-plus:dev-server",
           "options": {
-            "browserTarget": "angular-electron:build"
+            "browserTarget": "angular-electron:build",
+            "extraWebpackConfig": "node_modules/@typebytes/ngx-template-streams/webpack/webpack.config.js",
+            "plugin": "~node_modules/@typebytes/ngx-template-streams/internal/plugin.js"
           },
           "configurations": {
             "dev": {
@@ -88,7 +92,7 @@
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "ngx-build-plus:karma",
           "options": {
             "main": "src/test.ts",
             "polyfills": "src/polyfills-test.ts",
@@ -106,7 +110,9 @@
               "src/favicon.icns",
               "src/favicon.256x256.png",
               "src/favicon.512x512.png"
-            ]
+            ],
+            "extraWebpackConfig": "node_modules/@typebytes/ngx-template-streams/webpack/webpack.config.js",
+            "plugin": "~node_modules/@typebytes/ngx-template-streams/internal/plugin.js"
           }
         },
         "lint": {

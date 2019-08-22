@@ -73,9 +73,13 @@
     "typescript": "3.5.3",
     "wait-on": "3.3.0",
     "webdriver-manager": "12.1.5",
-    "zone.js": "0.9.1"
+    "zone.js": "0.9.1",
+    "ngx-build-plus": "^8.0.3"
   },
   "engines": {
     "node": ">=10.9.0"
+  },
+  "dependencies": {
+    "@typebytes/ngx-template-streams": "^1.2.0"
   }
 }

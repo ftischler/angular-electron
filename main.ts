@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, globalShortcut } from 'electron';
+import { app, BrowserWindow, screen, Menu, globalShortcut } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 
@@ -6,15 +6,17 @@ let win, serve;
 const args = process.argv.slice(1);
 serve = args.some(val => val === '--serve');
 
-// TODO change window width & height
-
 function createWindow() {
+
+  const electronScreen = screen;
+  const size = electronScreen.getPrimaryDisplay().workAreaSize;
 
   // Create the browser window.
   win = new BrowserWindow({
-    width: 1100,
-    height: 950,
-    center: true,
+    x: 0,
+    y: 0,
+    width: size.width,
+    height: size.height,
     webPreferences: {
       nodeIntegration: true,
     },

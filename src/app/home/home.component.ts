@@ -9,23 +9,28 @@ import {
 } from '@angular/core';
 import { ReadWriteImageService } from '../read-write-image/read-write-image.service';
 import { ReadExcelService } from '../read-excel/read-excel.service';
-import { Observable, Subject, timer } from 'rxjs';
-import { distinctUntilChanged, filter, finalize, map, take, takeUntil, withLatestFrom } from 'rxjs/operators';
+import { merge, Observable, Subject, timer } from 'rxjs';
+import {
+  distinctUntilChanged,
+  filter,
+  finalize,
+  map,
+  mapTo,
+  mergeAll,
+  switchMapTo,
+  take,
+  takeUntil,
+  withLatestFrom
+} from 'rxjs/operators';
 import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Schueler } from '../schueler.model';
 import * as moment from 'moment';
 import { MatSelect } from '@angular/material/select';
+import { ObservableEvent } from '@typebytes/ngx-template-streams';
 
-// TODO test this shit
-
-// TODO frage an amann: lieber duzen statt siezen? viele studien zeigen, emotionale ebene ansprechen, sogar bei versicherungen allianz eingesetzt
-
-// TODO frage an amann: idee: button in mat-card 'akzeptieren/abschliessen/...' -> wählt nächsten schüler aus (und löscht gebdatum). [wording zB passbild akzeptieren]
-// evtl sogar zusätzlich: Hinweismeldung, wenn Klasse durch ist und alle Schüler ein Bild abgespeichert haben!
-
-// TODO erweiterung/anmerkung: was tun bei gleichem namen in der gleichen klasse
-
-// type saveBtnStatus = 'a' | 'b';
+// TODO amann: besprechen: einstellungen nur mit pw zugang!
+// Angular Logo der .exe Datei ersetzen mit was?
+// meinen Namen irgendwo rein, Entwickler/Autor: Alexander Schuster
 
 function gebdatumValidator(): ValidatorFn {
   return (group: FormGroup): ValidationErrors => {
@@ -49,7 +54,6 @@ function gebdatumValidator(): ValidatorFn {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HomeComponent implements OnInit, OnDestroy {
-
   constructor(private readExcelService: ReadExcelService, private saveImageService: ReadWriteImageService) {}
 
   get klasseControl(): AbstractControl {
@@ -81,18 +85,40 @@ export class HomeComponent implements OnInit, OnDestroy {
   get filenameId(): string {
     return this.schuelerControl.value.id;
   }
+
+  // TODO use reactive version!
   @ViewChild('webcam', { static: true }) webcamVideo: ElementRef<HTMLVideoElement>;
   @ViewChild('canvas', { static: true }) canvas: ElementRef<HTMLCanvasElement>;
 
+  captureCountdown$: Observable<number>;
   countdown$: Observable<number>;
-  // saveBtnState$: Observable<saveBtnStatus>; // TODO use this to manage save btn state reactively
+
+  @ObservableEvent()
+  clickCapture$: Observable<any>;
+
+  @ObservableEvent()
+  clickTimedCapture$: Observable<any>;
+
+  submitted$: Observable<any> = merge([this.clickCapture$, this.clickTimedCapture$]).pipe(
+    mergeAll(),
+    mapTo(true)
+  );
+
+  captured$: Observable<any> = this.clickCapture$.pipe(
+    filter(() => this.klasseControl.valid),
+    filter(() => this.gebdatumControl.valid)
+  );
+
+  timedCaptured$: Observable<any> = this.clickTimedCapture$.pipe(
+    filter(() => this.klasseControl.valid),
+    filter(() => this.gebdatumControl.valid)
+  );
 
   schuelerForm: FormGroup;
 
   klassenPool: string[];
   schuelerPool: Schueler[];
 
-  submitted = false;
   pictureTaken = false;
   pictureLoaded = false;
 
@@ -169,7 +195,19 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.canvasCtx = this.canvas.nativeElement.getContext('2d');
+    this.captured$.subscribe(() => {
+      this.capture();
+    });
+
+    this.captureCountdown$ = timer(0, 1000).pipe(
+      take(this.COUNTDOWN_FROM + 1),
+      map(i => this.COUNTDOWN_FROM - i),
+      finalize(() => {
+        this.capture();
+      })
+    );
+
+    this.countdown$ = this.timedCaptured$.pipe(switchMapTo(this.captureCountdown$));
 
     this.schuelerForm = new FormGroup(
       {
@@ -206,6 +244,8 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.gebdatumControl.enable();
         this.gebdatumControl.reset();
       });
+
+    this.canvasCtx = this.canvas.nativeElement.getContext('2d');
 
     const webcamConfig = {
       audio: false,
@@ -247,51 +287,23 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.pictureTaken = false;
   }
 
+  nextSchueler(): void {
+    this.arrowRightNavigation();
+  }
+
   schuelerSelected(): boolean {
     return this.schuelerControl.value;
   }
 
   capture(): void {
-    this.submitted = true;
-    if (this.formsValid()) {
-      this.drawImage();
-      this.saveImage();
-      this.pictureTaken = true;
-      this.pictureLoaded = false;
-    }
-  }
-
-  timedCapture(): void {
-    this.submitted = true;
-    if (this.formsValid()) {
-      this.countdown$ = timer(0, 1000).pipe(
-        take(this.COUNTDOWN_FROM + 1),
-        map(i => this.COUNTDOWN_FROM - i),
-        finalize(() => {
-          this.capture();
-          this.countdown$ = undefined; // reset countdown observable, otherwise ngif="showcamera" restarts the countdown.
-        })
-      );
-    }
+    this.drawImage();
+    this.saveImage();
+    this.pictureTaken = true;
+    this.pictureLoaded = false;
   }
 
   drawImage(): void {
     this.canvasCtx.drawImage(this.webcamVideo.nativeElement, 0, 0, this.SQUARE_PICTURE, this.SQUARE_PICTURE);
-  }
-
-  formsValid(): boolean {
-    // TODO refactor this away, use mat input injectiontoken etc.
-    if (this.klasseControl.valid) {
-      if (this.gebdatumControl.valid) {
-        return true;
-      } else {
-        this.gebdatumControl.markAsTouched();
-        return false;
-      }
-    } else {
-      this.klasseControl.markAsTouched();
-      return false;
-    }
   }
 
   isFemaleSelected(): boolean {
